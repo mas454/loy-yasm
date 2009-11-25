@@ -2,7 +2,7 @@ require 'yasm'
 def +(a, b)
  10+20
 end
-m_abs = YASM.method(:abs, [:a]){
+=begin m_abs = YASM.method(:abs, [:a]){
   getlocal :a
   putobject 0
   send :>, 1
@@ -15,7 +15,7 @@ _ :label_else
 _ :label_end
   leave
 }
-
+=end
 iseq = YASM.toplevel([:a, :b, :c]){
   #
   # a = 10
@@ -23,7 +23,19 @@ iseq = YASM.toplevel([:a, :b, :c]){
   # p(a+b)
   # 3.times{|i| p i}
   #
-  definemethod(:abs, m_abs)
+  definemethod(:abs, YASM.method(:abs, [:a]){
+                              getlocal :a
+                              putobject 0
+                              send :>, 1
+                              branchunless :label_else
+                              getlocal :a
+                              jump :label_end
+                            _ :label_else
+                              getlocal :a
+                              send :-@, 0
+                            _ :label_end
+                              leave
+                           })
   putobject 10
   setlocal :a
   putobject 20
@@ -40,7 +52,6 @@ iseq = YASM.toplevel([:a, :b, :c]){
   pop
   putobject "abc"
   call :p, 1
-  pop
   putobject 3
   send :times, 0, block([:i]){
     putself

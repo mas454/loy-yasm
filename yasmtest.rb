@@ -23,7 +23,7 @@ iseq = YASM.toplevel([:a, :b, :c]){
   # p(a+b)
   # 3.times{|i| p i}
   #
-  definemethod(:abs, m_abs)
+  definemethod(:abs, m)
   putobject 10
   setlocal :a
   putobject 20
