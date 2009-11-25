@@ -1,0 +1,105 @@
+# -*-ruby-*-
+#
+
+class RubyVM
+  class InstructionSequence
+    class Instruction
+      InsnID2NO = {
+        :nop => 0,
+        :getlocal => 1,
+        :setlocal => 2,
+        :getspecial => 3,
+        :setspecial => 4,
+        :getdynamic => 5,
+        :setdynamic => 6,
+        :getinstancevariable => 7,
+        :setinstancevariable => 8,
+        :getclassvariable => 9,
+        :setclassvariable => 10,
+        :getconstant => 11,
+        :setconstant => 12,
+        :getglobal => 13,
+        :setglobal => 14,
+        :putnil => 15,
+        :putself => 16,
+        :putobject => 17,
+        :putspecialobject => 18,
+        :putiseq => 19,
+        :putstring => 20,
+        :concatstrings => 21,
+        :tostring => 22,
+        :toregexp => 23,
+        :newarray => 24,
+        :duparray => 25,
+        :expandarray => 26,
+        :concatarray => 27,
+        :splatarray => 28,
+        :checkincludearray => 29,
+        :newhash => 30,
+        :newrange => 31,
+        #:putnot => 32,
+        :pop => 32,
+        :dup => 33,
+        :dupn => 34,
+        :swap => 35,
+        :reput => 36,
+        :topn => 37,
+        :setn => 38,
+        :adjuststack => 39,
+        #:emptstack => 38,
+        #:definemethod => 39,
+        #:alias => 40,
+        #:undef => 41,
+        :defined => 40,
+        #:postexe => 43,
+        :trace => 41,
+        :defineclass => 42,
+        :send => 43,
+        :invokesuper => 44,
+        :invokeblock => 45,
+        :leave => 46,
+        :finish => 47,
+        :throw => 48,
+        :jump => 49,
+        :branchif => 50,
+        :branchunless => 51,
+        :getinlinecache => 52,
+        :onceinlinecache => 53,
+        :setinlinecache => 54,
+        :opt_case_dispatch => 55,
+        :opt_checkenv => 56,
+        :opt_plus => 57,
+        :opt_minus => 58,
+        :opt_mult => 59,
+        :opt_div => 60,
+        :opt_mod => 61,
+        :opt_eq => 62,
+        :opt_neq => 63,
+        :opt_lt => 64,
+        :opt_le => 65,
+        :opt_gt => 66,
+        :opt_ge => 67,
+        :opt_ltlt => 68,
+        :opt_aref => 69,
+        :opt_aset => 70,
+        :opt_length => 71,
+        :opt_succ => 72,
+        :opt_not => 73,
+        :opt_regexpmatch1 => 74,
+        :opt_regexpmatch2 => 75,
+        :opt_call_c_function => 76,
+        :bitblt => 77,
+        :answer => 78,
+
+      }
+      
+      def self.id2insn_no id
+        if InsnID2NO.has_key? id
+          InsnID2NO[id]
+        end
+      end
+    end
+  end
+end
+
+

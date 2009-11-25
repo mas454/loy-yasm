@@ -1,0 +1,50 @@
+require 'yasm'
+def +(a, b)
+ 10+20
+end
+m_abs = YASM.method(:abs, [:a]){
+  getlocal :a
+  putobject 0
+  send :>, 1
+  branchunless :label_else
+  getlocal :a
+  jump :label_end
+_ :label_else
+  getlocal :a
+  send :-@, 0
+_ :label_end
+  leave
+}
+
+iseq = YASM.toplevel([:a, :b, :c]){
+  #
+  # a = 10
+  # b = 20
+  # p(a+b)
+  # 3.times{|i| p i}
+  #
+  definemethod(:abs, m_abs)
+  putobject 10
+  setlocal :a
+  putobject 20
+  setlocal :b
+  putobject 100
+  setlocal :c
+  #putnil
+  getlocal :a
+  getlocal :b
+  send :+, 1
+  getlocal :c
+  send :+, 1
+  call :p, 1 # call means send with flags 4
+  pop
+  putobject 3
+  send :times, 0, block([:i]){
+    putself
+    getdynamic :i
+    call :p, 1
+    leave
+  }
+  leave
+}
+iseq.eval
