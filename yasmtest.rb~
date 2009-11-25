@@ -38,6 +38,9 @@ iseq = YASM.toplevel([:a, :b, :c]){
   send :+, 1
   call :p, 1 # call means send with flags 4
   pop
+  putobject "abc"
+  call :p, 1
+  pop
   putobject 3
   send :times, 0, block([:i]){
     putself
@@ -48,4 +51,3 @@ iseq = YASM.toplevel([:a, :b, :c]){
   leave
 }
 iseq.eval
-puts abs(-10)

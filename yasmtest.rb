@@ -38,6 +38,8 @@ iseq = YASM.toplevel([:a, :b, :c]){
   send :+, 1
   call :p, 1 # call means send with flags 4
   pop
+  putobject "abc"
+  call :p, 1
   putobject 3
   send :times, 0, block([:i]){
     putself
