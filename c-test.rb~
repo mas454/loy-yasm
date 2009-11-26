@@ -1,0 +1,15 @@
+require 'yasm'
+require 'lispu'
+iseq = YASM.toplevel([:b,:a]){
+putnil
+putobject 10
+setlocal :a
+putobject 20
+setlocal :b
+getlocal :a
+getlocal :b
+call :+, 2
+call :p, 1
+leave
+}
+iseq.eval
