@@ -1,24 +1,49 @@
 (define (object? code)
   (or (string? code) (number? code)))
 
+(define (program-list-compile code-list asm-list)
+  (if (null? code-list)
+      (append '((putnil))(reverse asm-list))
+      (let ((asm (compile (car code-list))))
+	(program-list-compile (cdr code-list) (cons asm asm-list)))))
+
 (define (compile code)
   (cond 
    ((object? code) `(putobject ,code))
-   ((symbol? (car code))
+   ((symbol? code) `(getlocal ',code))
+   ((=? code)
+    (set! symbol-list (cons (cadr code) symbol-list))
+    `(,(compile (caddr code)) (setlocal ',(cadr code))))
+   ((run? code)
     (append
-     '((putnil))
      (args-compile (cdr code) '())     
-	  `((call ',(car code) ,(length (cdr code))))))))
-(define (
+	  `((call ',(car code) ,(length (cdr code))))))
+   (else
+    (error code))))
+
+(define (run? code)
+  (symbol? (car code)))
+
 (define (args-compile code arg-list)
   (if (null? code)
       (reverse arg-list)
       (args-compile (cdr code)
 		    (cons (compile (car code)) arg-list))))
-(define (dprint a)
-  (display a))
+
+
+(define (dprint . lis)
+  (letrec ((print-list (lambda (lis)
+			 (if (not (null? lis))
+			     (begin
+			       (display (car lis))
+			       (print-list (cdr lis)))))))
+    (print-list lis)))
+
 (define (atom? a)
   (not (pair? a)))
+
+(define (=? exp)
+  (tagged-list? exp '=))
 
 (define (tagged-list? exp tag)
   (if (pair? exp)
@@ -39,7 +64,11 @@
     (dprint "putobject ")
     (print-obj atom)
     (newline)))
+(define (getlocal sym)
+  (dprint "getlocal :" sym "\n"))
 
+(define (setlocal sym)
+  (dprint "setlocal :" sym "\n"))
 
 (define (call fn len)
   (dprint "call :")
@@ -47,22 +76,31 @@
   (dprint ",")
   (dprint len)
   (newline))
+
 (define (putnil)
   (dprint "putnil")
   (newline))
+
 (define (asm-print asm)
  (dprint asm)
  (newline))
 
-
-(define (loy-compile code)
-  (let ((asm-list (compile code)))
-	(dprint "iseq = YASM.toplevel([]){\n")
-	(compile-print asm-list)
-	(dprint "leave\n")
-	(dprint "}\n iseq.eval\n")))
+(define symbol-list '())
+(define (loy-compile code-list)
+    (let ((asm-list (program-list-compile code-list '())))
+      (dprint "iseq = YASM.toplevel([")
+      (symbol-list-print symbol-list)
+      (dprint "]){\n")
+      (compile-print asm-list)
+      (dprint "leave\n" "}\n iseq.eval\n")))
   
-
+(define (symbol-list-print sym-lis)
+  (if (not (null? (cdr sym-lis)))
+      (begin
+	(dprint ":" (car sym-lis) ",")
+	(symbol-list-print (cdr sym-lis)))
+      (dprint ":" (car sym-lis))))
+      
 (define (compile-print asm-list)
   (if (not (null? asm-list))
       (if (symbol? (car asm-list))
@@ -71,6 +109,5 @@
 	      (compile-print (car asm-list))
 	      (compile-print (cdr asm-list))))))
 
-;(compile-print (compile '(puts (+ 10 20))))
-(loy-compile '(puts 10))
-;(asm-print (compile '(puts 10)))
+(loy-compile '((= x 20) (puts x)))
+;(loy-compile '(puts 10))
