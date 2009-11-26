@@ -130,6 +130,3 @@
 	      (compile-print (cdr asm-list))))))
 (define out-p (open-output-file "c-test.rb"))
 (loy-compile '((= a 10) (= b 20) (puts (+ a (+ b 20)))))
-;(asm-print (compile '(def abs (a)
-                      ; (+ a 10))))
-;(loy-compile '(puts 10))
