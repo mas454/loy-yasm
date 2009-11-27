@@ -1,5 +1,6 @@
 (define (object? code)
-  (or (string? code) (number? code)))
+  (or (string? code) (number? code) 
+      (eq? 'true code) (eq? 'false code)))
 
 (define (program-list-compile code-list asm-list)
   (if (null? code-list)
@@ -7,13 +8,23 @@
       (let ((asm (compile (car code-list) #f)))
 	(program-list-compile (cdr code-list) (cons asm asm-list)))))
 
+(define (if-compile code meth-argp)
+  `(,(compile (car code) #t) (branchunless 'else_part)
+    ,(compile (cadr code) meth-argp) (jump 'end) 
+    (_ 'else_part) ,(compile (caddr code) meth-argp)
+    (_ 'end)))
+
+(define true 'true)
+(define false 'false)
 (define (compile code meth-argp)
   (cond 
-   ((object? code) `(putobject ,code))
+   ((object? code) `(putobject ,code ,meth-argp))
    ((symbol? code) `(getlocal ',code))
    ((=? code)
     (set! symbol-list (cons (cadr code) symbol-list))
     `(,(compile (caddr code) meth-argp) (setlocal ',(cadr code))))
+   ((if? code)
+    (if-compile (cdr code) meth-argp))
    ((def? code)
     `(def ',(cdr code)))
    ((run? code)
@@ -55,12 +66,15 @@
 (define (def? exp)
   (tagged-list? exp 'def))
 
+(define (if? exp)
+  (tagged-list? exp 'if))
+
 (define (tagged-list? exp tag)
   (if (pair? exp)
       (eq? (car exp) tag)
       false))
 
-(define (putobject atom)
+(define (putobject atom flag)
   (letrec ((print-obj (lambda (atom)
 		       (cond ((string? atom)
 			      (dprint "\"")
@@ -70,7 +84,22 @@
 			      (dprint atom))))))		      
     (dprint "putobject ")
     (print-obj atom)
+    (if (not flag)
+	(dprint "\npop"))
     (dprint "\n")))
+
+(define (_ label)
+  (dprint "_ :" label "\n")) 
+
+(define (jump label)
+  (dprint "jump :" label "\n"))
+
+(define (branchunless label)
+  (dprint "branchunless :" label "\n"))
+
+(define (branchif label)
+  (dprint "branchif :" label "\n"))
+
 (define (getlocal sym)
   (dprint "getlocal :" sym "\n"))
 
@@ -89,7 +118,7 @@
 (define (def code)
   (dprint "definemethod(:" (car code) ",") 
   (method-compile-print code)
-  (dprint ")\n"))
+  (dprint ")\n" "pop\n"))
 
 (define (method-compile-print code)
   (define temp symbol-list)
@@ -129,4 +158,5 @@
 	      (compile-print (car asm-list))
 	      (compile-print (cdr asm-list))))))
 (define out-p (open-output-file "c-test.rb"))
-(loy-compile '((= a 10) (= b 20) (puts (+ a (+ b 20)))))
+
+(loy-compile '((if false (puts "hello") (puts "false"))))

@@ -1,19 +1,16 @@
 require 'yasm'
 require 'lispu'
-iseq = YASM.toplevel([:b,:a]){
+iseq = YASM.toplevel([]){
 putnil
-putobject 10
-setlocal :a
-putobject 20
-setlocal :b
-putnil
-getlocal :a
-putnil
-getlocal :b
-putobject 20
-call :+, 2
-call :+, 2
+putobject false
+branchunless :else_part
+putobject "hello"
 call :puts, 1
+jump :end
+_ :else_part
+putobject "false"
+call :puts, 1
+_ :end
 leave
 }
  iseq.eval
