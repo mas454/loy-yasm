@@ -2,11 +2,11 @@
   (or (string? code) (number? code) 
       (eq? 'true code) (eq? 'false code)))
 
-(define (program-list-compile code-list asm-list)
+(define (program-list-compile code-list asm-list meth-argp)
   (if (null? code-list)
       (reverse asm-list)
-      (let ((asm (compile (car code-list) #f)))
-	(program-list-compile (cdr code-list) (cons asm asm-list)))))
+      (let ((asm (compile (car code-list) meth-argp)))
+	(program-list-compile (cdr code-list) (cons asm asm-list) meth-argp))))
 
 (define (if-compile code meth-argp)
   `(,(compile (car code) #t) (branchunless 'else_part)
@@ -32,7 +32,11 @@
     (let ((arg-lis `((send ',(car code) 1)
 		    ,(compile (caddr code) #t)
 		    ,(compile (cadr code) #t))))
-      (infix-args-compile (cdddr code) (car code) arg-lis)))		    
+      (infix-args-compile (cdddr code) (car code) arg-lis)))
+   ((binfix? code)
+    `(,(compile (cadr code) #t)
+      ,(compile (caddr code) #t)
+      (send ',(car code) 1)))
    ((run? code)
     (if meth-argp
 	(append
@@ -75,7 +79,9 @@
   (not (pair? a)))
 
 (define (infix? exp)
-  (memq (car exp) '(+ - * / % **)))
+  (memq (car exp) '(+ - * / % **  ^ &)))
+(define (binfix? exp)
+  (memq (car exp) '(< > <= )))
 
 (define (=? exp)
   (tagged-list? exp '=))
@@ -141,7 +147,7 @@
 (define (method-compile-print code)
   (define temp symbol-list)
   (set! symbol-list (cadr code))
-  (let ((asm-list (append '((putnil))(program-list-compile (cddr code) '()))))
+  (let ((asm-list (append (program-list-compile (cddr code) '() #t))))
     (dprint "YASM.method(:" (car code) ", [")
     (symbol-list-print symbol-list)
     (dprint "]){\n")
@@ -151,13 +157,14 @@
 
 (define symbol-list '())
 (define (loy-compile code-list)
-    (let ((asm-list (append '((putnil))(program-list-compile code-list '()))))
+    (let ((asm-list (append '((putnil))
+			    (program-list-compile code-list '() #f))))
       (dprint "require \'yasm\'\n")
       (dprint "iseq = YASM.toplevel([")
       (symbol-list-print symbol-list)
       (dprint "]){\n")
       (compile-print asm-list)
-      (dprint "leave\n" "}\n iseq.eval\n")))
+      (dprint "leave\n" "}\n #puts iseq.disasm\n iseq.eval\n")))
   
 (define (symbol-list-print sym-lis)
   (if (not (null? sym-lis))
@@ -176,4 +183,8 @@
 	      (compile-print (cdr asm-list))))))
 (define out-p (open-output-file "c-test.rb"))
 
-(loy-compile '((puts (+ (* 10 20) 30 40))))
+
+(loy-compile '((def fib (x)
+		    (if (<= x 1)
+			1
+			(+ (fib (- x 2)) (fib (- x 1)))))))

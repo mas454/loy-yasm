@@ -1,14 +1,30 @@
 require 'yasm'
 iseq = YASM.toplevel([]){
 putnil
-putobject 10
-putobject 20
+definemethod(:fib,YASM.method(:fib, [:x]){
+getlocal :x
+putobject 1
+send :<=, 1
+branchunless :else_part
+putobject 1
+jump :end
+_ :else_part
+putnil
+getlocal :x
+putobject 2
+send :-, 1
+call :fib, 1
+putnil
+getlocal :x
+putobject 1
+send :-, 1
+call :fib, 1
 send :+, 1
-putobject 30
-send :+, 1
-putobject 40
-send :+, 1
-call :puts, 1
+_ :end
+leave
+})
+pop
 leave
 }
-puts iseq.dism
+ #puts iseq.disasm
+ iseq.eval
