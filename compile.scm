@@ -4,7 +4,7 @@
 
 (define (program-list-compile code-list asm-list)
   (if (null? code-list)
-      (append '((putnil))(reverse asm-list))
+      (reverse asm-list)
       (let ((asm (compile (car code-list) #f)))
 	(program-list-compile (cdr code-list) (cons asm asm-list)))))
 
@@ -29,9 +29,10 @@
    ((def? code)
     `(def ',(cdr code)))
    ((infix? code)
-    `(,(compile (cadr code) #t)
-      ,(compile (caddr code) #t)
-      (send ',(car code) 1)))
+    (let ((arg-lis `((send ',(car code) 1)
+		    ,(compile (caddr code) #t)
+		    ,(compile (cadr code) #t))))
+      (infix-args-compile (cdddr code) (car code) arg-lis)))		    
    ((run? code)
     (if meth-argp
 	(append
@@ -47,6 +48,14 @@
 (define (run? code)
   (symbol? (car code)))
 
+(define (infix-args-compile code inf arg-list)
+  (if (null? code)
+      (reverse arg-list)
+      (infix-args-compile 
+       (cdr code)
+       inf
+       `( (send ',inf 1) ,(compile (car code) #t) ,@arg-list))))
+ 
 (define (args-compile code arg-list)
   (if (null? code)
       (reverse arg-list)
@@ -66,7 +75,7 @@
   (not (pair? a)))
 
 (define (infix? exp)
-  (assoc (car exp) '((+ #t) (- #t))))
+  (memq (car exp) '(+ - * / % **)))
 
 (define (=? exp)
   (tagged-list? exp '=))
@@ -132,7 +141,7 @@
 (define (method-compile-print code)
   (define temp symbol-list)
   (set! symbol-list (cadr code))
-  (let ((asm-list (program-list-compile (cddr code) '())))
+  (let ((asm-list (append '((putnil))(program-list-compile (cddr code) '()))))
     (dprint "YASM.method(:" (car code) ", [")
     (symbol-list-print symbol-list)
     (dprint "]){\n")
@@ -142,9 +151,8 @@
 
 (define symbol-list '())
 (define (loy-compile code-list)
-    (let ((asm-list (program-list-compile code-list '())))
+    (let ((asm-list (append '((putnil))(program-list-compile code-list '()))))
       (dprint "require \'yasm\'\n")
-      (dprint "require \'lispu\'\n")
       (dprint "iseq = YASM.toplevel([")
       (symbol-list-print symbol-list)
       (dprint "]){\n")
@@ -168,4 +176,4 @@
 	      (compile-print (cdr asm-list))))))
 (define out-p (open-output-file "c-test.rb"))
 
-(loy-compile '((puts (+ 10 20))))
+(loy-compile '((puts (+ (* 10 20) 30 40))))
