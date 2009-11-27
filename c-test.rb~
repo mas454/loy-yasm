@@ -2,20 +2,10 @@ require 'yasm'
 require 'lispu'
 iseq = YASM.toplevel([]){
 putnil
-putobject "hello, worlde"
+putobject 10
+putobject 20
+send :+, 1
 call :puts, 1
-definemethod(:test,YASM.method(:test, []){
-putnil
-putobject "hello"
-call :puts, 1
-leave
-})
-definemethod(:test2,YASM.method(:test2, []){
-putnil
-putobject "hello"
-call :puts, 1
-leave
-})
 leave
 }
  iseq.eval

@@ -16,6 +16,7 @@
 
 (define true 'true)
 (define false 'false)
+
 (define (compile code meth-argp)
   (cond 
    ((object? code) `(putobject ,code ,meth-argp))
@@ -27,6 +28,10 @@
     (if-compile (cdr code) meth-argp))
    ((def? code)
     `(def ',(cdr code)))
+   ((infix? code)
+    `(,(compile (cadr code) #t)
+      ,(compile (caddr code) #t)
+      (send ',(car code) 1)))
    ((run? code)
     (if meth-argp
 	(append
@@ -60,6 +65,9 @@
 (define (atom? a)
   (not (pair? a)))
 
+(define (infix? exp)
+  (assoc (car exp) '((+ #t) (- #t))))
+
 (define (=? exp)
   (tagged-list? exp '=))
 
@@ -73,7 +81,8 @@
   (if (pair? exp)
       (eq? (car exp) tag)
       false))
-
+(define (send memth argc)
+  (dprint "send :" memth ", " argc "\n"))
 (define (putobject atom flag)
   (letrec ((print-obj (lambda (atom)
 		       (cond ((string? atom)
@@ -159,4 +168,4 @@
 	      (compile-print (cdr asm-list))))))
 (define out-p (open-output-file "c-test.rb"))
 
-(loy-compile '((if false (puts "hello") (puts "false"))))
+(loy-compile '((puts (+ 10 20))))
