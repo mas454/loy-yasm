@@ -20,14 +20,16 @@
 (define (compile code poped)
   (cond 
    ((object? code) `(putobject ,code ,poped))
-   ((symbol? code) `(getlocal ',code))
+   ((symbol? code) `(get ',code))
    ((=? code)
     (set! symbol-list (cons (cadr code) symbol-list))
-    `(,(compile (caddr code) #t) (setlocal ',(cadr code))))
+    `(,(compile (caddr code) #t) (set ',(cadr code))))
    ((if? code)
     (if-compile (cdr code) poped))
    ((def? code)
     `(def ',(cdr code)))
+   ((->? code)
+    `(-> ',(cdr code)))
    ((infix? code)
     (let ((arg-lis `((send ',(car code) 1)
 		    ,(compile (caddr code) #t)
@@ -69,8 +71,13 @@
 
 (define (ccall? code)
   (tagged-list? code 'ccall))
+
 (define (mcall? code)
   (tagged-list? code 'mcall))
+
+(define (->? code)
+  (tagged-list? code '->))
+
 (define (run? code)
   (symbol? (car code)))
 
@@ -153,11 +160,15 @@
 (define (branchif label)
   (dprint "branchif :" label "\n"))
 
-(define (getlocal sym)
-  (dprint "getlocal :" sym "\n"))
+(define (get sym)
+  (if blo
+      (dprint "getdynamic :" sym "\n")
+      (dprint "getlocal :" sym "\n")))
 
-(define (setlocal sym)
-  (dprint "setlocal :" sym "\n"))
+(define (set sym)
+  (if blo
+      (dprint "setdynamic :" sym "\n")
+      (dprint "setlocal :" sym "\n")))
 
 (define (call fn len)
   (dprint "call :" fn ", " len "\n"))
@@ -173,6 +184,26 @@
   (method-compile-print code)
   (dprint ")\n" "pop\n"))
 
+(define (-> code)
+  (dprint "putnil\n" "call :lambda, 0, ")
+  (lam-compile-print code)
+  (dprint "\n"))
+
+(define (lam-compile-print code)
+  (let ((temp1 symbol-list) (temp2 blo))
+    (set! blo #t)
+    (set! symbol-list (car code))
+    (let ((asm-list (append (program-list-compile (cdr code) '() #t))))
+      
+      (dprint "block([")
+      (symbol-list-print symbol-list)
+      (dprint "]){\n")
+      (compile-print asm-list)
+      (dprint "leave\n" "}"))
+    (set! symbol-list temp1)
+    (set! blo temp2)))
+  
+
 (define (method-compile-print code)
   (define temp symbol-list)
   (set! symbol-list (cadr code))
@@ -185,6 +216,7 @@
   (set! symbol-list temp))
 
 (define symbol-list '())
+(define blo #f)
 (define (loy-compile code-list)
     (let ((asm-list (append '((putnil))
 			    (program-list-compile code-list '() #f))))
@@ -214,5 +246,6 @@
 
 
 (loy-compile '((require "lispu.rb")
-	       (= x (ccall Test new))
-	       (mcall x abc "hello")))
+	       (= x (-> (a)
+			(puts a)))
+	       (mcall x call "hello")))

@@ -3,16 +3,17 @@ iseq = YASM.toplevel([:x]){
 putnil
 putobject "lispu.rb"
 call :require, 1
-_ :lstart
-getinlinecache 0, :lend
-getconstant :Test
-setinlinecache :lstart
-_ :lend
-send :new, 0
+putnil
+call :lambda, 0, block([:a]){
+putnil
+getdynamic :a
+call :puts, 1
+leave
+}
 setlocal :x
 getlocal :x
 putobject "hello"
-send :abc, 1
+send :call, 1
 pop
 leave
 }

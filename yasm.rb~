@@ -129,6 +129,7 @@ class RubyVM
       
       def sym2lidx sym
         raise unless @locals.index(sym)
+	puts sym
         #@local_sdb.locals.size - @local_sdb.locals.index(sym) + 1
 	@local_sdb.locals.size - @local_sdb.locals.index(sym)
       end
@@ -222,7 +223,7 @@ iseq = YASM.toplevel([:a, :b]){
   leave
 }
 
-p iseq
+#p iseq
 iseq #=> 30, 0, 1, 2
 
 ###########################################################
