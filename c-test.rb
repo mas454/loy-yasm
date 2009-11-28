@@ -1,43 +1,20 @@
 require 'yasm'
-iseq = YASM.toplevel([]){
+iseq = YASM.toplevel([:x]){
 putnil
-definemethod(:fib,YASM.method(:fib, [:x]){
+putobject "lispu.rb"
+call :require, 1
+_ :lstart
+getinlinecache 0, :lend
+getconstant :Test
+setinlinecache :lstart
+_ :lend
+send :new, 0
+setlocal :x
 getlocal :x
-putobject 1
-send :<=, 1
-branchunless :else_part
-putobject 1
-jump :end
-_ :else_part
-putnil
-getlocal :x
-putobject 2
-send :-, 1
-call :fib, 1
-putnil
-getlocal :x
-putobject 1
-send :-, 1
-call :fib, 1
-send :+, 1
-_ :end
-leave
-})
+putobject "hello"
+send :abc, 1
 pop
 leave
 }
  #puts iseq.disasm
  iseq.eval
-def fibr(x)
-  if x <= 1
-    1
-  else
-    fibr(x-2) + fibr(x-1)
-  end
-end
-
-require 'benchmark'
-3.times {
-  print "Scheme:", Benchmark.measure { fib(36)  }
-  print "Ruby:  ", Benchmark.measure { fibr(36) }
-}

@@ -3,9 +3,9 @@
       (eq? 'true code) (eq? 'false code)))
 
 (define (program-list-compile code-list asm-list meth-argp)
-  (if (null? code-list)
-      (reverse asm-list)
-      (let ((asm (compile (car code-list) meth-argp)))
+  (if (null? (cdr code-list))
+      (reverse (cons (compile (car code-list) meth-argp) asm-list))
+      (let ((asm (compile (car code-list) #f)))
 	(program-list-compile (cdr code-list) (cons asm asm-list) meth-argp))))
 
 (define (if-compile code meth-argp)
@@ -17,15 +17,15 @@
 (define true 'true)
 (define false 'false)
 
-(define (compile code meth-argp)
+(define (compile code poped)
   (cond 
-   ((object? code) `(putobject ,code ,meth-argp))
+   ((object? code) `(putobject ,code ,poped))
    ((symbol? code) `(getlocal ',code))
    ((=? code)
     (set! symbol-list (cons (cadr code) symbol-list))
-    `(,(compile (caddr code) meth-argp) (setlocal ',(cadr code))))
+    `(,(compile (caddr code) #t) (setlocal ',(cadr code))))
    ((if? code)
-    (if-compile (cdr code) meth-argp))
+    (if-compile (cdr code) poped))
    ((def? code)
     `(def ',(cdr code)))
    ((infix? code)
@@ -37,8 +37,26 @@
     `(,(compile (cadr code) #t)
       ,(compile (caddr code) #t)
       (send ',(car code) 1)))
+   ((mcall? code) ;(ccall x abc ...)
+    (if poped
+	(append `(,(compile (cadr code) #t))
+		(args-compile (cdddr code) '())
+		`((send ',(caddr code) ,(length (cdddr code)))))
+	(append `(,(compile (cadr code) #t))
+		(args-compile (cdddr code) '())
+		`((send ',(caddr code) ,(length (cdddr code))))
+		'((pop)))))
+   ((ccall? code) ;(ccall Test abc ...) Test.abc(...)
+    (if poped
+	(append `((getconstant ',(cadr code)))
+		(args-compile (cdddr code) '())
+		`((send ',(caddr code) ,(length (cdddr code)))))
+	(append `((getconstant ',(cadr code)))
+		(args-compile (cdddr code) '())
+		`((send ',(caddr code) ,(length (cdddr code))))
+		'((pop)))))
    ((run? code)
-    (if meth-argp
+    (if poped
 	(append
 	 '((putnil))
 	 (args-compile (cdr code) '())     
@@ -49,6 +67,10 @@
    (else
     (error code))))
 
+(define (ccall? code)
+  (tagged-list? code 'ccall))
+(define (mcall? code)
+  (tagged-list? code 'mcall))
 (define (run? code)
   (symbol? (car code)))
 
@@ -111,10 +133,17 @@
     (if (not flag)
 	(dprint "\npop"))
     (dprint "\n")))
-
+(define (getconstant sym)
+      (dprint "_ :lstart\n" 
+	      "getinlinecache 0, :lend\n"
+	      "getconstant :" sym "\n"
+	      "setinlinecache :lstart\n"
+	      "_ :lend\n"))
+      
 (define (_ label)
   (dprint "_ :" label "\n")) 
-
+(define (pop)
+  (dprint "pop\n"))
 (define (jump label)
   (dprint "jump :" label "\n"))
 
@@ -184,7 +213,6 @@
 (define out-p (open-output-file "c-test.rb"))
 
 
-(loy-compile '((def fib (x)
-		    (if (<= x 1)
-			1
-			(+ (fib (- x 2)) (fib (- x 1)))))))
+(loy-compile '((require "lispu.rb")
+	       (= x (ccall Test new))
+	       (mcall x abc "hello")))

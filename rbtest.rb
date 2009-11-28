@@ -1,3 +1,6 @@
-#3.times{|i| p i}
-puts RubyVM::InstructionSequence.compile_file("rbtest.rb").disasm
 
+puts RubyVM::InstructionSequence.compile_file("rbtest.rb").disasm
+require "lispu.rb"
+
+x = Test.new
+x.abc(20)
