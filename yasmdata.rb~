@@ -45,7 +45,7 @@ class RubyVM
         :reput => 36,
         :topn => 37,
         :setn => 38,
-        :adjuststack => 39
+        :adjuststack => 39,
         #:emptstack => 38,
         #:definemethod => 39,
         #:alias => 40,
