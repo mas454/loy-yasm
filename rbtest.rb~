@@ -2,6 +2,6 @@
 puts RubyVM::InstructionSequence.compile_file("rbtest.rb").disasm
 require "lispu.rb"
 
-x = -> {
+x = lambda {
          puts "hello, world"
         }

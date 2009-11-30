@@ -50,10 +50,10 @@
 		'((pop)))))
    ((ccall? code) 
     (if poped
-	(append `((getconstant ',(cadr code)))
+	(append `((cgetconstant ',(cadr code)))
 		(args-compile (cdddr code))
 		`((send ',(caddr code) ,(length (cdddr code)))))
-	(append `((getconstant ',(cadr code)))
+	(append `((cgetconstant ',(cadr code)))
 		(args-compile (cdddr code))
 		`((send ',(caddr code) ,(length (cdddr code))))
 		'((pop)))))
@@ -135,12 +135,20 @@
     (if (not flag)
 	(dprint "\npop"))
     (dprint "\n")))
-(define (getconstant sym)
+(define (cgetconstant sym)
+  (if (symbol? sym)
       (dprint "_ :lstart\n" 
 	      "getinlinecache 0, :lend\n"
 	      "getconstant :" sym "\n"
 	      "setinlinecache :lstart\n"
-	      "_ :lend\n"))
+	      "_ :lend\n")
+      (begin 
+	(dprint "_ :lstart\n" "getinlinecache 0, :lend\n")
+	(map (lambda (s)
+	       (dprint "getconstant :" s "\n")) sym)
+	(dprint "setinlinecache :lstart\n"
+		"_ :lend\n"))))
+	
       
 (define (_ label)
   (dprint "_ :" label "\n")) 
@@ -240,6 +248,8 @@
 (define out-p (open-output-file "c-test.rb"))
 
 
-(loy-compile '((puts (+ 10 20 40))))
-;(display (compile '(require "lispu.rb") #f))
-;(newline)
+(loy-compile '((require "lispu.rb")
+	       (= iseq
+		  (ccall (RubyVM 
+			  InstructionSequence) compile_file "rbtest.rb"))
+	       (puts (mcall iseq disasm)))) 
