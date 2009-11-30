@@ -3,10 +3,10 @@
       (eq? 'true code) (eq? 'false code)))
 
 (define (program-list-compile code-list asm-list meth-argp)
-  (if (null? (cdr code-list))
-      (reverse (cons (compile (car code-list) meth-argp) asm-list))
-      (let ((asm (compile (car code-list) #f)))
-	(program-list-compile (cdr code-list) (cons asm asm-list) meth-argp))))
+  (let ((rcode-list (reverse code-list)))
+    (reverse (cons (compile (car rcode-list) meth-argp)
+		   (map (lambda (a)
+			  (compile a #f)) (cdr rcode-list))))))
 
 (define (if-compile code meth-argp)
   `(,(compile (car code) #t) (branchunless 'else_part)
