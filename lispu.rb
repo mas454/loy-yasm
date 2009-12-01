@@ -18,7 +18,7 @@ def putlist_loop(a)
 end
 
 class Test
-def Test.abc(a)
+def abc(a)
  puts a 
 end
 end

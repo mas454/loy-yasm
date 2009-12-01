@@ -4,9 +4,9 @@ putnil
 putobject "lispu.rb"
 call :require, 1
 putnil
-call :lambda, 0, block([:a]){
+call :lambda, 0, block([:a]) -> {
 putnil
-getlocal :a
+getdynamic :a
 call :puts, 1
 leave
 }

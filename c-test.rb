@@ -1,19 +1,19 @@
 require 'yasm'
-iseq = YASM.toplevel([]){
+iseq = YASM.toplevel([:x]){
 putnil
 putobject "lispu.rb"
 call :require, 1
+_ :lstart
+getinlinecache 0, :lend
+getconstant :Test
+setinlinecache :lstart
+_ :lend
+send :new, 0
+setlocal :x
+getlocal :x
 putobject 10
-putobject 20
-putobject nil
-newarray 2
-newarray 2
-putobject 1
-send :[], 1
-call :print, 1
-putobject "
-"
-call :print, 1
+send :abc, 1
+pop
 leave
 }
  #puts iseq.disasm

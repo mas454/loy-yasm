@@ -1,8 +1,9 @@
 (define (object? code)
-  (or (string? code) (number? code) 
+  (or (string? code) (number? code)
+      (eq? 'nil code)
       (eq? 'true code) (eq? 'false code)))
 
-(define (program-list-compile code-list asm-list meth-argp)
+(define (program-list-compile code-list meth-argp)
   (let ((rcode-list (reverse code-list)))
     (reverse (cons (compile (car rcode-list) meth-argp)
 		   (map (lambda (a)
@@ -16,6 +17,7 @@
 
 (define true 'true)
 (define false 'false)
+(define nil 'nil)
 
 (define (compile code poped)
   (cond 
@@ -24,6 +26,18 @@
    ((=? code)
     (set! symbol-list (cons (cadr code) symbol-list))
     `(,(compile (caddr code) #t) (set ',(cadr code))))
+   ((cons? code)
+    (list (compile (cadr code) #t)
+	  (compile (caddr code) #t)
+	  '(newarray 2)))
+   ((car? code)
+    (list (compile (cadr code) #t)
+	  '(putobject 0 #t)
+	  '(send '|[]| 1)))
+   ((cdr? code)
+    (list (compile (cadr code) #t)
+	  '(putobject 1 #t)
+	  '(send '|[]| 1)))
    ((if? code)
     (if-compile (cdr code) poped))
    ((def? code)
@@ -68,6 +82,13 @@
 	 `((call ',(car code) ,(length (cdr code)))))))
    (else
     (error code))))
+  
+(define (car? code)
+  (tagged-list? code 'car))
+(define (cdr? code)
+  (tagged-list? code 'cdr))
+(define (cons? code)
+  (tagged-list? code 'cons))
 
 (define (ccall? code)
   (tagged-list? code 'ccall))
@@ -135,6 +156,10 @@
     (if (not flag)
 	(dprint "\npop"))
     (dprint "\n")))
+
+(define (newarray code)
+  (dprint "newarray " code "\n"))
+
 (define (cgetconstant sym)
   (if (symbol? sym)
       (dprint "_ :lstart\n" 
@@ -196,7 +221,7 @@
   (let ((temp1 symbol-list) (temp2 blo))
     (set! blo #t)
     (set! symbol-list (car code))
-    (let ((asm-list (append (program-list-compile (cdr code) '() #t))))
+    (let ((asm-list (append (program-list-compile (cdr code) #t))))
       
       (dprint "block([")
       (symbol-list-print symbol-list)
@@ -210,7 +235,7 @@
 (define (method-compile-print code)
   (define temp symbol-list)
   (set! symbol-list (cadr code))
-  (let ((asm-list (append (program-list-compile (cddr code) '() #t))))
+  (let ((asm-list (append (program-list-compile (cddr code) #t))))
     (dprint "YASM.method(:" (car code) ", [")
     (symbol-list-print symbol-list)
     (dprint "]){\n")
@@ -222,7 +247,7 @@
 (define blo #f)
 (define (loy-compile code-list)
     (let ((asm-list (append '((putnil))
-			    (program-list-compile code-list '() #f))))
+			    (program-list-compile code-list  #f))))
       (dprint "require \'yasm\'\n")
       (dprint "iseq = YASM.toplevel([")
       (symbol-list-print symbol-list)
@@ -241,15 +266,16 @@
 (define (compile-print asm-list)
   (if (not (null? asm-list))
       (if (symbol? (car asm-list))
-	    (eval asm-list (interaction-environment))
-	    (begin
+	  (eval asm-list (interaction-environment))
+	  (begin
 	      (compile-print (car asm-list))
 	      (compile-print (cdr asm-list))))))
 (define out-p (open-output-file "c-test.rb"))
 
-
+;(display (program-list-compile '((require "lispu.rb")
+	;		(putlist (cons 10 (cons 20 nil))))
+		;      #f))
 (loy-compile '((require "lispu.rb")
-	       (= iseq
-		  (ccall (RubyVM 
-			  InstructionSequence) compile_file "rbtest.rb"))
-	       (puts (mcall iseq disasm)))) 
+	       (print 
+		(cdr (cons 10 (cons 20 nil))))
+	       (print "\n")))
