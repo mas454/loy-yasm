@@ -10,10 +10,11 @@
 			  (compile a #f)) (cdr rcode-list))))))
 
 (define (if-compile code meth-argp)
-  `(,(compile (car code) #t) (branchunless 'else_part)
-    ,(compile (cadr code) meth-argp) (jump 'end) 
-    (_ 'else_part) ,(compile (caddr code) meth-argp)
-    (_ 'end)))
+  (let ((else_part (gensym)) (end (gensym)))
+  `(,(compile (car code) #t) (branchunless ',else_part)
+    ,(compile (cadr code) meth-argp) (jump ',end) 
+    (_ ',else_part) ,(compile (caddr code) meth-argp)
+    (_ ',end))))
 
 (define true 'true)
 (define false 'false)
@@ -82,11 +83,16 @@
 	 `((call ',(car code) ,(length (cdr code)))))))
    (else
     (error code))))
-  
+
+(define (cond? code)
+  (tagged-list? code 'cond))
+
 (define (car? code)
   (tagged-list? code 'car))
+
 (define (cdr? code)
   (tagged-list? code 'cdr))
+
 (define (cons? code)
   (tagged-list? code 'cons))
 
@@ -125,8 +131,9 @@
 
 (define (infix? exp)
   (memq (car exp) '(+ - * / % **  ^ &)))
+
 (define (binfix? exp)
-  (memq (car exp) '(< > <= )))
+  (memq (car exp) '(< > <= ==)))
 
 (define (=? exp)
   (tagged-list? exp '=))
@@ -141,8 +148,10 @@
   (if (pair? exp)
       (eq? (car exp) tag)
       false))
+
 (define (send memth argc)
   (dprint "send :" memth ", " argc "\n"))
+
 (define (putobject atom flag)
   (letrec ((print-obj (lambda (atom)
 		       (cond ((string? atom)
@@ -177,6 +186,7 @@
       
 (define (_ label)
   (dprint "_ :" label "\n")) 
+
 (define (pop)
   (dprint "pop\n"))
 (define (jump label)
@@ -272,10 +282,14 @@
 	      (compile-print (cdr asm-list))))))
 (define out-p (open-output-file "c-test.rb"))
 
-;(display (program-list-compile '((require "lispu.rb")
-	;		(putlist (cons 10 (cons 20 nil))))
-		;      #f))
+
+;(loy-compile '((if false
+	;	   (puts 10)
+		;   (if true
+		 ;      (puts "hello")
+		  ;     (puts "world")))))
 (loy-compile '((require "lispu.rb")
-	       (print 
-		(cdr (cons 10 (cons 20 nil))))
-	       (print "\n")))
+	       (= x (ccall Test new))
+	       (mcall x abc 10)))
+
+
