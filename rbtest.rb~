@@ -1,7 +1,8 @@
+require("lispu.rb")
+x=[10, [20, nil]]
+print x
+#puts RubyVM::InstructionSequence.compile_file("rbtest.rb").disasm
 
-puts RubyVM::InstructionSequence.compile_file("rbtest.rb").disasm
-require "lispu.rb"
 
-x = lambda {
-         puts "hello, world"
-        }
+
+
