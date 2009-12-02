@@ -9,13 +9,32 @@
 		   (map (lambda (a)
 			  (compile a #f)) (cdr rcode-list))))))
 
-(define (if-compile code meth-argp)
+(define (if-compile code poped)
   (let ((else_part (gensym)) (end (gensym)))
   `(,(compile (car code) #t) (branchunless ',else_part)
-    ,(compile (cadr code) meth-argp) (jump ',end) 
-    (_ ',else_part) ,(compile (caddr code) meth-argp)
+    ,(compile (cadr code) poped) (jump ',end) 
+    (_ ',else_part) ,(compile (caddr code) poped)
     (_ ',end))))
 
+(define (cond-compile code poped)
+  (let ((next (gensym)) (end (gensym)))
+    (append
+     (list (compile (caar code) #t)
+	   `(branchunless ',next)
+	   (program-list-compile (cdar code) poped)
+	   `(jump ',end))
+     (map (lambda (c) ;((eq? a 'hello) (puts a))
+	    (let ((n next))
+	      (set! next (gensym))
+	      `((_ ',n)
+		,(compile (car c) #t)
+		(branchunless ',next)
+		,(program-list-compile (cdr c) poped)
+		(jump ',end))))
+	  (cdr code))
+     `((_ ',next))
+     `((_ ',end)))))
+	     
 (define true 'true)
 (define false 'false)
 (define nil 'nil)
@@ -41,6 +60,8 @@
 	  '(send '|[]| 1)))
    ((if? code)
     (if-compile (cdr code) poped))
+   ((cond? code)
+    (cond-compile (cdr code) poped))
    ((def? code)
     `(def ',(cdr code)))
    ((->? code)
@@ -288,8 +309,11 @@
 		;   (if true
 		 ;      (puts "hello")
 		  ;     (puts "world")))))
-(loy-compile '((require "lispu.rb")
-	       (= x (ccall Test new))
-	       (mcall x abc 10)))
+(loy-compile '((cond 
+		(false
+		 (puts "hello"))
+		(true
+		 (= x 10)
+		 (puts x)))))
 
 

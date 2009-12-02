@@ -7,8 +7,6 @@ putobject "hello"
 call :puts, 1
 jump :G1
 _ :G0
-putobject true
-branchunless :G2
 putobject 10
 setlocal :x
 getlocal :x
