@@ -1,18 +1,56 @@
 require 'yasm'
-iseq = YASM.toplevel([]){
+iseq = YASM.toplevel([:x]){
 putnil
-putobject false
-branchunless :G0
-putobject "hello"
+definemethod(:cons,YASM.method(:cons, [:a,:b,:c]){
+putnil
+call :lambda, 0, block([:f]){
+getdynamic :f
+getdynamic :a
+#getdynamic :b
+#send :call, 2
+pop
+pop
+leave
+}
+leave
+})
+pop
+definemethod(:car,YASM.method(:car, [:f]){
+getlocal :f
+putnil
+call :lambda, 0, block([:a,:b]){
+getdynamic :a
+leave
+}
+send :call, 1
+leave
+})
+pop
+definemethod(:cdr,YASM.method(:cdr, [:f]){
+getlocal :f
+putnil
+call :lambda, 0, block([:a,:b]){
+getdynamic :b
+leave
+}
+send :call, 1
+leave
+})
+pop
+putnil
+putobject "a"
+putobject "b"
+putobject 10
+call :cons, 3
+setlocal :x
+putnil
+getlocal :x
+call :car, 1
 call :puts, 1
-jump :G1
-_ :G0
-putobject true
-branchunless :G2
-putobject "world"
+putnil
+getlocal :x
+call :cdr, 1
 call :puts, 1
-jump :G1
-_ :G1
 leave
 }
  #puts iseq.disasm

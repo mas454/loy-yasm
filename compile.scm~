@@ -26,12 +26,16 @@
      (map (lambda (c) ;((eq? a 'hello) (puts a))
 	    (let ((n next))
 	      (set! next (gensym))
-	      `((_ ',n)
-		,(compile (car c) #t)
-		(branchunless ',next)
-		,(program-list-compile (cdr c) poped)
-		(jump ',end))))
-	  (cdr code))
+	      (if (eq? (car c) 'else)
+		  `((_ ',n)
+		    ,(program-list-compile (cdr c) poped)
+		    (jump ',end))
+		  `((_ ',n)
+		    ,(compile (car c) #t)
+		    (branchunless ',next)
+		    ,(program-list-compile (cdr c) poped)
+		    (jump ',end)))))
+	    (cdr code))
      `((_ ',next))
      `((_ ',end)))))
 	     
@@ -312,7 +316,7 @@
 (loy-compile '((cond 
 		(false
 		 (puts "hello"))
-		(true
+		(else
 		 (= x 10)
 		 (puts x)))))
 

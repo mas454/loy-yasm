@@ -144,10 +144,14 @@ class RubyVM
       def sym2didx sym
         sdb = self
         level = 0
+        if idx = sdb.locals.index(sym)
+           #return [sdb.locals.size - idx, level]
+	   return [sdb.locals.size - idx+1, level]
+        end
         while sdb
           if idx = sdb.locals.index(sym)
            #return [sdb.locals.size - idx, level]
-	   return [sdb.locals.size - idx+1, level]
+	   return [sdb.locals.size - idx, level]
           end
           level += 1
           sdb = sdb.parent_sdb
