@@ -50,18 +50,18 @@
    ((=? code)
     (set! symbol-list (cons (cadr code) symbol-list))
     `(,(compile (caddr code) #t) (set ',(cadr code))))
-   ((cons? code)
-    (list (compile (cadr code) #t)
-	  (compile (caddr code) #t)
-	  '(newarray 2)))
-   ((car? code)
-    (list (compile (cadr code) #t)
-	  '(putobject 0 #t)
-	  '(send '|[]| 1)))
-   ((cdr? code)
-    (list (compile (cadr code) #t)
-	  '(putobject 1 #t)
-	  '(send '|[]| 1)))
+   ;((cons? code)
+    ;(list (compile (cadr code) #t)
+	;  (compile (caddr code) #t)
+	 ; '(newarray 2)))
+   ;((car? code)
+    ;(list (compile (cadr code) #t)
+	;  '(putobject 0 #t)
+	 ; '(send '|[]| 1)))
+;   ((cdr? code)
+ ;   (list (compile (cadr code) #t)
+	;  '(putobject 1 #t)
+	 ; '(send '|[]| 1)))
    ((if? code)
     (if-compile (cdr code) poped))
    ((cond? code)
@@ -284,6 +284,7 @@
     (let ((asm-list (append '((putnil))
 			    (program-list-compile code-list  #f))))
       (dprint "require \'yasm\'\n")
+      (dprint "require \'loy\'\n")
       (dprint "iseq = YASM.toplevel([")
       (symbol-list-print symbol-list)
       (dprint "]){\n")
@@ -313,11 +314,28 @@
 		;   (if true
 		 ;      (puts "hello")
 		  ;     (puts "world")))))
-(loy-compile '((cond 
-		(false
-		 (puts "hello"))
-		(else
-		 (= x 10)
-		 (puts x)))))
+(define list-func '(
+		    (def cons (a b)
+			 (-> (f)
+			   (lamcall f  a b)))
+		    (def car (f)
+			 (lamcall f  (-> (a b)
+					   a)))
+		    (def cdr (f)
+			 (if (== f nil)
+			     nil
+			     (lamcall f  (-> (a b)
+					     b))))
+		    (= x (cons "a" (cons "b" nil)))
+		    (puts (cdr (cdr x)))))
+		    
+			 
+(define cond-test '((cond 
+		     (false
+		      (puts "hello"))
+		     (else
+		      (= x 10)
+		      (puts x)))))
+(loy-compile list-func)
 
 

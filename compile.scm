@@ -38,7 +38,10 @@
 	    (cdr code))
      `((_ ',next))
      `((_ ',end)))))
-	     
+(define (let-compile lis)
+  `(lamcall (-> ,(map car (car lis)) ,@(cdr lis))
+	    ,@(map cadr (car lis))))
+
 (define true 'true)
 (define false 'false)
 (define nil 'nil)
@@ -50,22 +53,24 @@
    ((=? code)
     (set! symbol-list (cons (cadr code) symbol-list))
     `(,(compile (caddr code) #t) (set ',(cadr code))))
-   ;((cons? code)
-    ;(list (compile (cadr code) #t)
-	;  (compile (caddr code) #t)
-	 ; '(newarray 2)))
-   ;((car? code)
-    ;(list (compile (cadr code) #t)
-	;  '(putobject 0 #t)
-	 ; '(send '|[]| 1)))
-;   ((cdr? code)
- ;   (list (compile (cadr code) #t)
-	;  '(putobject 1 #t)
-	 ; '(send '|[]| 1)))
+   ((cons? code)
+    (list (compile (cadr code) #t)
+	  (compile (caddr code) #t)
+	 '(newarray 2)))
+   ((car? code)
+    (list (compile (cadr code) #t)
+	  '(putobject 0 #t)
+	  '(send '|[]| 1)))
+   ((cdr? code)
+    (list (compile (cadr code) #t)
+	  '(putobject 1 #t)
+	  '(send '|[]| 1)))
    ((if? code)
     (if-compile (cdr code) poped))
    ((cond? code)
     (cond-compile (cdr code) poped))
+   ((let? code)
+    (compile (let-compile (cdr code)) poped))
    ((def? code)
     `(def ',(cdr code)))
    ((->? code)
@@ -165,6 +170,9 @@
 
 (define (def? exp)
   (tagged-list? exp 'def))
+
+(define (let? exp)
+  (tagged-list? exp 'let))
 
 (define (if? exp)
   (tagged-list? exp 'if))
@@ -314,7 +322,15 @@
 		;   (if true
 		 ;      (puts "hello")
 		  ;     (puts "world")))))
-(define list-func '(
+(define let-test '(
+		   (let ((a 10))
+		     (let ((b 20))
+		       (let ((c 30))
+			 (puts (+ a b c)))))
+		   )
+  )
+  
+(define list-test '(
 		    (def cons (a b)
 			 (-> (f)
 			   (lamcall f  a b)))
@@ -336,6 +352,7 @@
 		     (else
 		      (= x 10)
 		      (puts x)))))
-(loy-compile list-func)
+
+(loy-compile let-test)
 
 

@@ -95,7 +95,7 @@ class RubyVM
       def block args=[], vars=[], &b
         sdb = SimpleDataBuilder.new(
           :block, "block", "TODO: filename",
-          args, vars, [], self
+          args, vars, [nil], self
         )
         sdb.instance_eval(&b)
         sdb.to_a
@@ -144,16 +144,14 @@ class RubyVM
       def sym2didx sym
         sdb = self
         level = 0
-        if idx = sdb.locals.index(sym)
+        #if idx = sdb.locals.index(sym)
            #return [sdb.locals.size - idx, level]
-	   puts sdb.locals.to_s
-	   return [sdb.locals.size - idx+1, level]
-        end
+	 #  return [sdb.locals.size - idx+1, level]
+        #end
         while sdb
           if idx = sdb.locals.index(sym)
-           #return [sdb.locals.size - idx, level]
-	   puts sdb.locals.to_s
-	   return [sdb.locals.size - idx, level]
+           return [sdb.locals.size - idx+1, level]
+	   #return [sdb.locals.size - idx, level]
           end
           level += 1
           sdb = sdb.parent_sdb
