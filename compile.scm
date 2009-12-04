@@ -323,10 +323,8 @@
 		 ;      (puts "hello")
 		  ;     (puts "world")))))
 (define let-test '(
-		   (let ((a 10))
-		     (let ((b 20))
-		       (let ((c 30))
-			 (puts (+ a b c)))))
+		   (let ((a 10) (b 20))
+			 (puts (+ a b)))
 		   )
   )
   
@@ -352,7 +350,8 @@
 		     (else
 		      (= x 10)
 		      (puts x)))))
-
-(loy-compile let-test)
+(display (let-compile (cdar let-test)))
+(newline)
+;(loy-compile let-test)
 
 
