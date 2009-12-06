@@ -7,7 +7,18 @@ def car(f)
    f.call(lambda {|a, b|
 		b})
 end
-puts car(con(10, 20)) 
+class Metest
+ def Metest.test
+  puts "test"
+ end
+end
+puts(if true
+      "hello"
+     "world"
+     end,30)
+
+obj=Metest.method(:test)
+obj.call
 #puts RubyVM::InstructionSequence.compile_file("rbtest.rb").disasm
 
 
