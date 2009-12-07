@@ -96,7 +96,7 @@
 	 (infix-compile (car code) (cdr code)))
 	((binfix? code)
 	 ;(display (car code))(newline)
-	 (binfix-compile (car code) (cadr code) (caddr code)))
+	 (binfix-compile (car code) (cadr code) (caddr code) argp))
 	((run? code)
 	 (list (list 'putobject (list 'quote (car code)) #t)
 	       (if (null? (cdr code))
@@ -112,9 +112,9 @@
   (memq (car exp) '(+ - * / % **  ^ &)))
 (define (binfix? exp)
   (memq (car exp) '(< > <= ==)))
-(define (binfix-compile inf arg1 arg2)
+(define (binfix-compile inf arg1 arg2 argp)
   (list (compile arg1 #t) (list 'comprint (list 'quote inf))
-	(compile arg2 #t)))
+	(compile arg2 argp)))
 
 (define (infix-compile inf args-list)
   (append
@@ -244,15 +244,25 @@
 		   )
   )
 (define quote-test '(
-		      '((a b) c)
+		      (display '((a b) c))
 		      )
   )
   
 (define (l2r code-list)
-  ;(dprint "require \"loy\"\n")
+  (dprint "require \"loy\"\n")
   (compile-print (program-list-compile code-list))
   )
-;(display (program-list-compile quote-test))
-;(newline)
 
-(l2r quote-test)
+(define list-fun '(
+		   (def list_loop (lis num)
+			(if (== (lis.length) num)
+			    nil
+			    (cons (lis.get num)
+				  (list_loop lis (+ num 1)))))
+		   (def list (*b)
+			(list_loop b 0))
+		   (display (list 20 30 40 50))))
+			
+;(display (program-list-compile list-fun))
+;(newline)
+(l2r list-fun)
