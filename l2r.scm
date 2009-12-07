@@ -19,8 +19,6 @@
   (dprint v " = "))
 
 (define (putobject code argp)
-  (display argp)
-  (newline)
   (if (string? code)
       (dprint "\"" code "\"")
       (dprint code))
@@ -66,7 +64,11 @@
 (define (compile code argp)
   (cond ((object? code) (list 'putobject code argp))
 	((symbol? code) (list 'putobject (list 'quote code) argp))
-	((quote? code) (quote-compile (cadr code) argp))
+	((quote? code)
+	 (if (symbol? (cadr code))
+	     (list (list 'comprint ":")
+		   (list 'putobject (list 'quote (cadr code)) argp))
+	     (compile (quote-compile (cadr code)) argp)))
 	((=? code) 
 	 (list (list 'set (list 'quote (cadr code)))
 		     (compile (caddr code) #f)))
@@ -93,7 +95,7 @@
 	((infix? code)
 	 (infix-compile (car code) (cdr code)))
 	((binfix? code)
-	 (display (car code))(newline)
+	 ;(display (car code))(newline)
 	 (binfix-compile (car code) (cadr code) (caddr code)))
 	((run? code)
 	 (list (list 'putobject (list 'quote (car code)) #t)
@@ -104,6 +106,8 @@
 	)
 )
 
+(define (symbol-printx sym)
+  (dprint ":" sym))
 (define (infix? exp)
   (memq (car exp) '(+ - * / % **  ^ &)))
 (define (binfix? exp)
@@ -124,17 +128,16 @@
   (append (list 'lamcall (append (list '-> (map car (car lis))) (cdr lis)))
 	    (map cadr (car lis))))
 
-(define (quote-compile lis argp)
-  (cond ((null? lis)
-	 (list 'putobject 'nil argp))
+(define (quote-compile lis)
+  (cond 
+   ((null? lis) nil)
    ((symbol? lis)
-    (list '(comprint ":") 
-	  (list 'comprint (symbol->string lis))
-	  (if argp '() '(comprint "\n"))))
-   ((object? lis) (list 'putobject lis argp))
+    (list 'quote lis))
+   ((object? lis) lis)
    (else
-    (compile (list 'cons (quote-compile (car lis) #t)
-		   (cdr (quote-compile (cdr lis) #t))) argp))))
+    (list 'cons 
+	  (quote-compile (car lis))
+	  (quote-compile (cdr lis))))))
 
 
 (define (quote? exp)
@@ -212,8 +215,6 @@
   )
 
 (define (compile-print asm-list)
-  (display asm-list)
-  (newline)
   (if (not (null? asm-list))
       (if (symbol? (car asm-list))
 	  (eval asm-list (interaction-environment))
@@ -234,7 +235,7 @@
 (define cond-test '(
 		    (cond (false (puts "hello, world"))
 			  (false "hello")
-			  (else (puts "succ")))
+			  (else (puts 'a)))
 		    )
   )
 (define let-test '(
@@ -243,7 +244,7 @@
 		   )
   )
 (define quote-test '(
-		      '(a b)
+		      '((a b) c)
 		      )
   )
   
