@@ -1,12 +1,14 @@
 require("lispu.rb")
-def con(a, b)
+eval "def con(a, b)
  lambda {|f|
         f.call(a, b)}
-end
+ end"
 def car(f)
    f.call(lambda {|a, b|
 		b})
 end
+x = con 10, 20
+puts car x
 class Metest
  def Metest.test
   puts "test"
