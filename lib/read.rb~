@@ -116,10 +116,10 @@ class Reader
       getChar
       return nil
     end
-    top =  Cell.new
+    top =  Array.new 2
     list = top
     while true
-      list.car = getSexp
+      list[0] = getSexp
       nextChar
       if @ch == ")"
 	break
@@ -127,12 +127,12 @@ class Reader
 	return nil
       elsif @ch == "."
 	getChar
-	list.cdr = getSexp
+	list[1] = getSexp
 	getChar
 	return top
       end
-      list.cdr = Cell.new
-      list = list.cdr
+      list[1] = Array.new 2
+      list = list[1]
     end
     getChar
     top
@@ -140,9 +140,9 @@ class Reader
   def makeQuote
     top = Array.new 2
     list = top
-    list.car = :quote
+    list[0] = :quote
     getChar
-    list.cdr = getSexp
+    list[1] = getSexp
     top
   end
   def makeString

@@ -1,6 +1,5 @@
 require "lib/lib.rb"
 require("read.rb")
-reqiore("loy.rb")
 def string?(a)
 a.kind_of?(String)
 end

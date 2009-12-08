@@ -7,6 +7,24 @@ class Reader
   def initialize
     init
   end
+  def read(i)
+    str = ""
+    lparen = 0
+    while(!i.eof?)
+      ch = i.getc.chr #.id2name
+      if ch == "("
+        lparen += 1
+      elsif ch == ")"
+        lparen -= 1
+        str.concat(")")
+        if lparen == 0
+          return str
+        end
+      end
+      str = str.concat(ch)
+    end
+    str
+  end
   def lex(s="")
     @indexOfLine = 0;
     @line = s;
@@ -57,12 +75,13 @@ class Reader
       when "\""
 	return makeString
       else
-	if @ch == " "
-	  break
+	if /\s/ =~ @ch
+	  #break
 	elsif /[0-9]/ =~ @ch
 	  return makeNumber
-	end
-	return makeSymbol
+	else #end
+          return makeSymbol
+        end
       end
       getChar
     end
@@ -157,4 +176,8 @@ class Reader
     str
   end
 end
+i=open("lib.loy", "r")
+r = Reader.new
+puts r.read(i)
+#puts r.lex("(a . c)").to_s
 

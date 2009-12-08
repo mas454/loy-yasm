@@ -1,5 +1,3 @@
-(require "read.rb")
-(reqiore "loy.rb")
 (def string? (a)
      (a.kind_of? String))
 (def number? (o)
@@ -8,15 +6,8 @@
      (o.kind_of? Symbol))
 
 (def eq? (a b)
-     (a.equal? b))
+     (== a b))
 
 (def null? (a)
      (a.nil?))
-
-(= S_READER (Reader.new))
-
-(def read (io)
-     	 (S_READER io))
-
-(def (open_input_file path)
-     (open path "r"))
+     
