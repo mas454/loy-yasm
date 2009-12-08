@@ -205,8 +205,6 @@
   )
 
 (define (-> lam-list argp)
-  (display lam-list)
-  (newline)
   (dprint "lambda {|")
   (def-arg-print (car lam-list)) 
   (dprint "|\n")
@@ -222,7 +220,7 @@
 	      (compile-print (car asm-list))
 	      (compile-print (cdr asm-list))))))
 
-(define out-p (open-output-file "l2r-test.rb"))
+
 (define if-test '((= x 10)(if true (puts x)))) ;(puts "else"))))
 (define def-test '((def test (a b) (puts a b)) (test 20 30)))
 (define lambda-test '(
@@ -249,7 +247,7 @@
   )
   
 (define (l2r code-list)
-  (dprint "require \"loy\"\n")
+  (dprint "require \"lib/lib.rb\"\n")
   (compile-print (program-list-compile code-list))
   )
 
@@ -262,7 +260,27 @@
 		   (def list (*b)
 			(list_loop b 0))
 		   (display (list 20 30 40 50))))
+(define kind-test '(
+		    (= a "abc")
+		    (puts 'a)
+		    )
+  )
+
 			
 ;(display (program-list-compile list-fun))
 ;(newline)
-(l2r list-fun)
+(define (s-read file-name)
+  (with-input-from-file file-name
+    (lambda ()
+      (let loop ((ls1 '()) (s (read)))
+	(if (eof-object? s)
+	    (reverse ls1)
+	    (loop (cons s ls1) (read)))))))
+(define out-p (open-output-file "l2r-test.rb"))
+(define out-p '())
+(define (main args)
+(let ((program-list (s-read (cadr args))))
+  (set! out-p (open-output-file (caddr args)))
+    (l2r program-list)))
+
+;(l2r kind-test)

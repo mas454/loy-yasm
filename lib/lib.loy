@@ -1,0 +1,13 @@
+(def string? (a)
+     (a.kind_of? String))
+(def number? (o)
+     (o.kind_of? Numeric))
+(def symbol? (o)
+     (o.kind_of? Symbol))
+
+(def eq? (a b)
+     (== a b))
+
+(def null? (a)
+     (a.nil?))
+     
