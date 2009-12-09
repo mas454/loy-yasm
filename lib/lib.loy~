@@ -1,3 +1,5 @@
+(require "lib/read.rb")
+(reqiore "lib/loy.rb")
 (def string? (a)
      (a.kind_of? String))
 (def number? (o)
@@ -6,8 +8,23 @@
      (o.kind_of? Symbol))
 
 (def eq? (a b)
-     (== a b))
+     (a.equal? b))
 
 (def null? (a)
      (a.nil?))
-     
+
+(= S_READER (Reader.new))
+
+(def read (io)
+     	 (S_READER io))
+
+(def (open_input_file path)
+     (open path "r"))
+
+(def (map fn lis)
+     (if (null? lis)
+	 nil
+	 (cons 
+	  (fn.call (car lis))
+	  (map fn (cdr lis)))))
+

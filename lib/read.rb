@@ -176,8 +176,8 @@ class Reader
     str
   end
 end
-i=open("lib.loy", "r")
-r = Reader.new
-puts r.read(i)
+#i=open("lib.loy", "r")
+#r = Reader.new
+#puts r.read(i)
 #puts r.lex("(a . c)").to_s
 

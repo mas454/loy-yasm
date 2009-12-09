@@ -1,5 +1,5 @@
-(require "read.rb")
-(reqiore "loy.rb")
+(require "lib/read.rb")
+(require "lib/loy.rb")
 (def string? (a)
      (a.kind_of? String))
 (def number? (o)
@@ -20,3 +20,11 @@
 
 (def (open_input_file path)
      (open path "r"))
+
+(def (map fn lis)
+     (if (null? lis)
+	 nil
+	 (cons 
+	  (fn.call (car lis))
+	  (map fn (cdr lis)))))
+

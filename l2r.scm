@@ -7,9 +7,11 @@
   (tagged-list? exp '=))
 
 (define (def-arg-print lis)
-  (dprint (car lis))
-  (map (lambda (code)
-	 (dprint ", " code)) (cdr lis)))
+  (if (not (null? lis))
+      (begin
+	(dprint (car lis))
+	(map (lambda (code)
+	       (dprint ", " code)) (cdr lis)))))
 
 (define (dprint . lis)
   (map (lambda (code)
@@ -109,18 +111,25 @@
 (define (symbol-printx sym)
   (dprint ":" sym))
 (define (infix? exp)
-  (memq (car exp) '(+ - * / % **  ^ &)))
+  (memq (car exp) '(+ - * / % **  ^ & or)))
 (define (binfix? exp)
   (memq (car exp) '(< > <= ==)))
 (define (binfix-compile inf arg1 arg2 argp)
-  (list (compile arg1 #t) (list 'comprint (list 'quote inf))
+  (list (compile arg1 #t) 
+	(list 'comprint " ")
+	(list 'comprint (list 'quote inf))
+	(list 'comprint " ")
 	(compile arg2 argp)))
 
 (define (infix-compile inf args-list)
   (append
    (list (compile (car args-list) #t))
    (map (lambda (args)
-	  (list (list 'comprint (list 'quote inf)) (compile args #t)))
+	  (list
+	   (list 'comprint " ")
+	   (list 'comprint (list 'quote inf)) 
+	   (list 'comprint " ")
+	   (compile args #t)))
 	(cdr args-list))))
 
 
@@ -145,12 +154,22 @@
 (define (def? exp)
   (tagged-list? exp 'def))
 (define (->? code)
-  (tagged-list? code '->))
+  (or 
+   (tagged-list? code 'lambda)
+   (tagged-list? code '->)))
 (define (def code)
-  (dprint "def " (car code) "(")
-  (def-arg-print (cadr code)) (dprint ")\n")
-  (compile-print (program-list-compile (cddr code)))
-  (dprint "end\n"))
+  (if (symbol? (car code))
+      (begin
+	(dprint "def " (car code) "(")
+	(def-arg-print (cadr code)) (dprint ")\n")
+	(compile-print (program-list-compile (cddr code))))
+      (begin
+	(dprint "def " (caar code) "(")
+	(def-arg-print (cdar code)) (dprint ")\n")
+	(compile-print (program-list-compile (cdr code)))))
+  
+  
+  (dprint "end\n\n"))
 
 (define (program-list-compile code-list)
   (map (lambda (a)
@@ -222,7 +241,7 @@
 
 
 (define if-test '((= x 10)(if true (puts x)))) ;(puts "else"))))
-(define def-test '((def test (a b) (puts a b)) (test 20 30)))
+(define def-test '((def (test a b) (puts a b)) (test 20 30)))
 (define lambda-test '(
 		      (= lam (-> (a b)
 				 (puts a b)))
@@ -247,7 +266,6 @@
   )
   
 (define (l2r code-list)
-  (dprint "require \"lib/lib.rb\"\n")
   (compile-print (program-list-compile code-list))
   )
 
@@ -277,10 +295,17 @@
 	    (reverse ls1)
 	    (loop (cons s ls1) (read)))))))
 (define out-p (open-output-file "l2r-test.rb"))
-(define out-p '())
-(define (main args)
-(let ((program-list (s-read (cadr args))))
-  (set! out-p (open-output-file (caddr args)))
+;(define out-p '())
+(define (lib-compile)
+  (let ((program-list (s-read "lib/lib.loy")))
+    (set! out-p (open-output-file "lib/lib.rb"))
     (l2r program-list)))
 
-;(l2r kind-test)
+(define (main args)
+  (let ((program-list (s-read (cadr args))))
+    (set! out-p (open-output-file (caddr args)))
+    (dprint "require \"lib/lib.rb\"\n")
+    (l2r program-list)))
+
+;(l2r def-test)
+;(lib-compile)
