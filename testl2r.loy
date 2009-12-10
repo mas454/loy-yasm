@@ -22,9 +22,72 @@
       (eq? (car exp) tag)
       false))
 
-(define (def_arg_print lis)
+(def (def_arg_print lis)
   (if (not (null? lis))
       (begin
 	(dprint (car lis))
 	(map (lambda (code)
 	       (dprint ", " code)) (cdr lis)))))
+
+(def (set v)
+  (dprint v " = "))
+
+(def (putobject code argp)
+  (if (string? code)
+      (dprint "\"" code "\"")
+      (dprint code))
+  (if (not argp)
+      (dprint "\n")))
+
+(def (cons? code)
+  (tagged-list? code 'cons))
+
+(def (car? code)
+  (tagged-list? code 'car))
+
+(def (cdr? code)
+  (tagged-list? code 'cdr))
+
+(def (lparen)
+  (dprint "("))
+
+(def (rparen argp)
+  (dprint ")" (if argp "" "\n")))
+
+(def (block? lis)
+  (if (null? lis)
+      '()
+      (if (tagged-list? (car lis) 'block)
+	  (cdar lis)
+	  (block? (cdr lis)))))
+
+(def (args-compile args argp)
+  (let ((code1 (list (compile (car args) #t))))
+	(append
+	 (list '(lparen))
+	 (list code1)
+	 (if (null? (cdr args))
+	     '()
+	     (map (lambda (code)
+		    (if (tagged-list? code 'block)
+			'()
+			(list '(canma) 
+			      (compile code #t))))
+		  (cdr args)))
+	 (list (list 'rparen #t))
+	 (let ((blo (block? args)))
+	   (if (null? blo)
+	       '()
+	       (list 'block-compile (list'quote blo))))
+	 (if argp
+	     '()
+	     '((comprint "\n"))))))
+
+
+
+
+
+
+
+
+

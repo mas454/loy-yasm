@@ -350,6 +350,7 @@
   (let ((program-list (s-read "lib/lib.loy")))
     (set! out-p (open-output-file "lib/lib.rb"))
     (l2r program-list)))
+
 (define begin-test
   '(
     (begin
@@ -357,7 +358,11 @@
       (puts a))
     )
   )
-
+(define reverse-test '(
+		       (display (append '(a b c) '(d e f)))
+		       (print "\n")
+		       )
+)
 ;(display (program-list-compile block-test))
 ;(newline)
 
@@ -366,6 +371,8 @@
   ;  (set! out-p (open-output-file (caddr args)))
    ; (dprint "require \"lib/lib.rb\"\n")
     ;(l2r program-list)))
-(l2r begin-test)
-;(l2r quote-test)
-;(lib-compile)
+(define (l2r-test t-list)
+  (dprint "require \"lib/lib.rb\"\n")
+  (l2r t-list))
+(l2r-test reverse-test)
+(lib-compile)

@@ -14,17 +14,14 @@ class Metest
   puts "test"
  end
 end
-puts(if true
-      "hello"
-     "world"
+puts(if false
+	"hello"
+     else
+        "world"
      end,30)
 
 obj=Metest.method(:test)
 obj.call
-begin
- i = 10
-end
-puts i, "i"
 #puts RubyVM::InstructionSequence.compile_file("rbtest.rb").disasm
 
 

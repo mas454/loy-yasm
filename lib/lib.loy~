@@ -1,5 +1,5 @@
 (require "lib/read.rb")
-(reqiore "lib/loy.rb")
+(require "lib/loy.rb")
 (def string? (a)
      (a.kind_of? String))
 (def number? (o)

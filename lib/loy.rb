@@ -21,9 +21,9 @@ def putlist_loop(a, out)
   if(a[1] != nil)
     putlist a[0], out
     out.print ' '
-    putlist_loop(a[1])
+    putlist_loop(a[1], out)
   else
-    putlist a[0]
+    putlist a[0], out
     out.print ")"
   end
 end

@@ -14,9 +14,10 @@ class Metest
   puts "test"
  end
 end
-puts(if true
-      "hello"
-     "world"
+puts("test",if false
+	"hello"
+     else
+        "world"
      end,30)
 
 obj=Metest.method(:test)
