@@ -36,8 +36,10 @@
 
 (define (car? code)
   (tagged-list? code 'car))
+
 (define (cdr? code)
   (tagged-list? code 'cdr))
+
 (define (tagged-list? exp tag)
   (if (pair? exp)
       (eq? (car exp) tag)
@@ -65,7 +67,7 @@
 		    (if (tagged-list? code 'block)
 			'()
 			(list '(canma) 
-			      (compqile code #t))))
+			      (compile code #t))))
 		  (cdr args)))
 	 (list (list 'rparen #t))
 	 (let ((block (block? args)))
@@ -84,9 +86,13 @@
   (cond ((object? code) (list 'putobject code argp))
 	((symbol? code) (list 'putobject (list 'quote code) argp))
 	((quote? code)
-	 (if (symbol? (cadr code))
+	 (if (symbol? (cadr code)) 
 	     (list (list 'comprint ":")
-		   (list 'putobject (list 'quote (cadr code)) argp))
+		   (list 'putobject 
+			 (if (eq? (cadr code) '=)
+			     "="
+			     (list 'quote (cadr code)))
+			 argp))
 	     (compile (quote-compile (cadr code)) argp)))
 	((=? code) 
 	 (list (list 'set (list 'quote (cadr code)))
@@ -337,11 +343,11 @@
 ;(display (program-list-compile block-test))
 ;(newline)
 
-;(define (main args)
- ; (let ((program-list (s-read (cadr args))))
-  ;  (set! out-p (open-output-file (caddr args)))
-   ; (dprint "require \"lib/lib.rb\"\n")
-    ;(l2r program-list)))
+(define (main args)
+  (let ((program-list (s-read (cadr args))))
+    (set! out-p (open-output-file (caddr args)))
+    (dprint "require \"lib/lib.rb\"\n")
+    (l2r program-list)))
 
-(l2r block-test)
+;(l2r quote-test)
 ;(lib-compile)

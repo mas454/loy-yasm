@@ -4,28 +4,27 @@ class Array
  end	
 end
 
-def display(sexp)
- putlist sexp
- print "\n"
+def display(sexp, out=STDOUT)
+ putlist sexp, out
 end
 
-def putlist(a)
+def putlist(a, out)
  if a.kind_of?(Array)
-  print '('
-  putlist_loop(a)
+  out.print '('
+  putlist_loop a, out
  else
   print a
  end
 end
 
-def putlist_loop(a)
+def putlist_loop(a, out)
   if(a[1] != nil)
-    putlist a[0]
-    print ' '
+    putlist a[0], out
+    out.print ' '
     putlist_loop(a[1])
   else
     putlist a[0]
-    print ")"
+    out.print ")"
   end
 end
 
@@ -56,3 +55,4 @@ end
 def null?(a)
  a.nil?()
 end
+

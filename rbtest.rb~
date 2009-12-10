@@ -8,7 +8,7 @@ def car(f)
 		b})
 end
 x = con 10, 20
-car x
+puts car x
 class Metest
  def Metest.test
   puts "test"
@@ -21,6 +21,10 @@ puts(if true
 
 obj=Metest.method(:test)
 obj.call
+begin
+ i = 10
+end
+puts i, "i"
 #puts RubyVM::InstructionSequence.compile_file("rbtest.rb").disasm
 
 

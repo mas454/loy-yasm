@@ -1,0 +1,30 @@
+(def (dprint  *lis)
+     (lis.map (block (code)
+		     (display code))))
+
+(def (object? code)
+  (or (string? code) (number? code)
+      (eq? nil code)
+      (eq? true code) (eq? false code)))
+
+
+(def (set? exp)
+     (tagged_list? exp '=))
+     ;(if (pair? exp)	
+	; (== (car exp) "=")
+       ;false))
+
+(def (pair? exp)
+     (exp.kind_of? Array))
+
+(def (tagged_list? exp tag)
+  (if (pair? exp)
+      (eq? (car exp) tag)
+      false))
+
+(define (def_arg_print lis)
+  (if (not (null? lis))
+      (begin
+	(dprint (car lis))
+	(map (lambda (code)
+	       (dprint ", " code)) (cdr lis)))))
