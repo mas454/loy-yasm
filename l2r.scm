@@ -41,11 +41,18 @@
 (define (tagged-list? exp tag)
   (if (pair? exp)
       (eq? (car exp) tag)
-      false))
+      #f))
 (define (lparen)
   (dprint "("))
 (define (rparen argp)
   (dprint ")" (if argp "" "\n")))
+
+(define (block? lis)
+  (if (null? lis)
+      '()
+      (if (tagged-list? (car lis) 'block)
+	  (cdar lis)
+	  (block? (cdr lis)))))
 
 (define (args-compile args argp)
   (let ((code1 (list (compile (car args) #t))))
@@ -55,10 +62,20 @@
 	 (if (null? (cdr args))
 	     '()
 	     (map (lambda (code)
-		    (list '(canma) 
-			  (compile code #t)))
+		    (if (tagged-list? code 'block)
+			'()
+			(list '(canma) 
+			      (compqile code #t))))
 		  (cdr args)))
-	 (list (list 'rparen argp)))))
+	 (list (list 'rparen #t))
+	 (let ((block (block? args)))
+	   (if (null? block)
+	       '()
+	       (list 'block-compile (list'quote block))))
+	 (if argp
+	     '()
+	     '((comprint "\n"))))))
+	 
 
 (define (run? code)
   (symbol? (car code)))
@@ -103,7 +120,14 @@
 	 (list (list 'putobject (list 'quote (car code)) #t)
 	       (if (null? (cdr code))
 		       (list '0-args argp)
-		       (args-compile (cdr code) argp))))
+		       (if (and (null? (cddr code))
+				(tagged-list? (cadr code) 'block))
+			   (list (list '0-args #t)
+				 (list 'block-compile (list 'quote 
+							    (cdadr code))))
+			   (args-compile (cdr code) argp)))))
+	(else
+	 (error "unknown expression type -- compile" code))
 	 
 	)
 )
@@ -222,7 +246,13 @@
 (define (canma)
   (dprint ",")
   )
-
+(define (block-compile bl-list)
+  (dprint " {|")
+  (def-arg-print (car bl-list)) 
+  (dprint "|\n")
+  (compile-print (program-list-compile (cdr bl-list)))
+  (dprint "}\n")
+  )
 (define (-> lam-list argp)
   (dprint "lambda {|")
   (def-arg-print (car lam-list)) 
@@ -283,10 +313,13 @@
 		    (puts 'a)
 		    )
   )
+(define block-test '(
+		     (3.times (block 
+			       (i k)
+			       (p i)))))
 
 			
-;(display (program-list-compile list-fun))
-;(newline)
+
 (define (s-read file-name)
   (with-input-from-file file-name
     (lambda ()
@@ -301,11 +334,14 @@
     (set! out-p (open-output-file "lib/lib.rb"))
     (l2r program-list)))
 
-(define (main args)
-  (let ((program-list (s-read (cadr args))))
-    (set! out-p (open-output-file (caddr args)))
-    (dprint "require \"lib/lib.rb\"\n")
-    (l2r program-list)))
+;(display (program-list-compile block-test))
+;(newline)
 
-;(l2r def-test)
+;(define (main args)
+ ; (let ((program-list (s-read (cadr args))))
+  ;  (set! out-p (open-output-file (caddr args)))
+   ; (dprint "require \"lib/lib.rb\"\n")
+    ;(l2r program-list)))
+
+(l2r block-test)
 ;(lib-compile)
