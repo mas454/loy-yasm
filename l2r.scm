@@ -117,8 +117,10 @@
 	 (list 'def (list 'quote (cdr code))))
 	((->? code)
 	 (list '-> (list 'quote (cdr code)) argp))
+	((begin? code)
+	 (list 'begin-print (list 'quote (cdr code))))
 	((infix? code)
-	 (infix-compile (car code) (cdr code)))
+	 (infix-compile (car code) (cdr code) argp))
 	((binfix? code)
 	 ;(display (car code))(newline)
 	 (binfix-compile (car code) (cadr code) (caddr code) argp))
@@ -151,7 +153,7 @@
 	(list 'comprint " ")
 	(compile arg2 argp)))
 
-(define (infix-compile inf args-list)
+(define (infix-compile inf args-list argp)
   (append
    (list (compile (car args-list) #t))
    (map (lambda (args)
@@ -160,7 +162,10 @@
 	   (list 'comprint (list 'quote inf)) 
 	   (list 'comprint " ")
 	   (compile args #t)))
-	(cdr args-list))))
+	(cdr args-list))
+   (if argp
+       '()
+       '(comprint "\n"))))
 
 
 (define (let-compile lis)
@@ -240,6 +245,9 @@
 (define (if? exp)
   (tagged-list? exp 'if))
 
+(define (begin? exp)
+  (tagged-list? exp 'begin))
+
 (define (0-args argp)
   (dprint "()" (if argp "" "\n")))
 (define (lbrack)
@@ -266,6 +274,9 @@
   (compile-print (program-list-compile (cdr lam-list)))
   (dprint "}" (if argp "" "\n"))
   )
+
+(define (begin-print code-list)
+  (compile-print (program-list-compile code-list)))
 
 (define (compile-print asm-list)
   (if (not (null? asm-list))
@@ -339,15 +350,22 @@
   (let ((program-list (s-read "lib/lib.loy")))
     (set! out-p (open-output-file "lib/lib.rb"))
     (l2r program-list)))
+(define begin-test
+  '(
+    (begin
+      (+ 10 20 30 40)
+      (puts a))
+    )
+  )
 
 ;(display (program-list-compile block-test))
 ;(newline)
 
-(define (main args)
-  (let ((program-list (s-read (cadr args))))
-    (set! out-p (open-output-file (caddr args)))
-    (dprint "require \"lib/lib.rb\"\n")
-    (l2r program-list)))
-
+;(define (main args)
+ ; (let ((program-list (s-read (cadr args))))
+  ;  (set! out-p (open-output-file (caddr args)))
+   ; (dprint "require \"lib/lib.rb\"\n")
+    ;(l2r program-list)))
+(l2r begin-test)
 ;(l2r quote-test)
 ;(lib-compile)
