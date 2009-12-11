@@ -1,3 +1,14 @@
+
+(def (string_list_append str_list)
+     (if (null? str_list)
+	 ""
+	 (+ (car str_list) (string_list_append (cdr str_list)))))
+
+(def (map fn lis)
+     (if (null? lis)
+	 nil
+	 (cons (fn.call (car lis)) (cdr lis))))
+
 (def (object? code)
   (or (string? code) (number? code)
       (eq? nil code) (symbol? code)
@@ -24,6 +35,9 @@
 	 ""
 	 "\n"))
 
+(def (cddr code)
+     (cdr (cdr code)))
+
 (def (cadr code)
      (car (cdr code)))
 
@@ -41,6 +55,8 @@
 	    (+ "" (compile (cadr code) true) "[0]" (argp_print argp)))
 	   ((cdr? code)
 	    (+ "" (compile (cadr code) true) "[1]" (argp_print argp)))
+	   ((if? code)
+	    (if_compile (cdr code) argp))
 	   ((run? code)
 	    (+ "" (car code) 
 	       (if (null? (cdr code))
@@ -49,6 +65,17 @@
 	   
 	   )
      )
+
+(def (if? exp)
+  (tagged_list? exp 'if))
+
+(def (if_compile code argp)
+     (+ "if " (compile (car code) false)
+	(compile (cadr code) false)
+	(if (null? (cddr code))
+	    ""
+	    (+ "else\n" (compile (caddr code) false)))
+	"end" (argp_print argp)))
 
 (def (args_cdr_compile args_list)
      (if (null? args_list)
@@ -65,5 +92,23 @@
 
 (def (cdr? code)
   (tagged_list? code 'cdr))
+(def (cond? code)
+  (tagged_list? code 'cond))
 
-(puts (compile '(car (cons 10 (cons 20 nil))) false))
+(def (cond_compile code argp)
+     (+ "if " (compile (caar code) false)
+	(program_list_compile (cdar code))
+	(if (null? (cdr code))
+	    ""
+	   (string_list_append 
+	    (map (-> (con)
+		     (if (eq? 'else (car con))
+			 (+ "else\n"
+			    (program_list_compile (cdr con)))
+			 (+ "elsif " (compile (car con)false)
+			    (program_list_compile (cdr con)))))
+		 (cdr code))))
+	"end" (argp_print argp)))
+	
+;(puts (compile '(if true "hello" "world") false))
+(puts (string_list_append '("abc" "def" "hij")))

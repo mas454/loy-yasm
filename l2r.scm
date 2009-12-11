@@ -209,8 +209,10 @@
 (define (program-list-compile code-list)
   (map (lambda (a)
 	 (compile a #f)) code-list))
+
 (define (let? exp)
   (tagged-list? exp 'let))
+
 (define (if-compile code argp)
   (list '(comprint "if ") (compile (car code) #f)
     (compile (cadr code) #f)
@@ -222,6 +224,7 @@
 
 (define (cond? code)
   (tagged-list? code 'cond))
+
 (define (cond-compile code argp)
   (append
    (list '(comprint "if ") (compile (caar code) #f)
