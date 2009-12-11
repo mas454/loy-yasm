@@ -49,6 +49,10 @@ def symbol?(o)
  o.kind_of?(Symbol)
 end
 
+def pair?(exp)
+ exp.kind_of?(Array) 
+end
+
 def eq?(a, b)
  a==b
 end

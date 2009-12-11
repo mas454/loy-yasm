@@ -23,7 +23,7 @@ def putlist_loop(a, out)
     out.print ' '
     putlist_loop(a[1], out)
   else
-    putlist a[0]
+    putlist a[0], out
     out.print ")"
   end
 end
@@ -48,7 +48,9 @@ end
 def symbol?(o)
  o.kind_of?(Symbol)
 end
-
+def pair?(exp)
+ exp.kind_of?(Array) 
+end
 def eq?(a, b)
  a==b
 end

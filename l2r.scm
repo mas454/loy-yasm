@@ -80,7 +80,7 @@
 	 
 
 (define (run? code)
-  (symbol? (car code)))
+  (and (pair? code) (symbol? (car code))))
 
 (define (compile code argp)
   (cond ((object? code) (list 'putobject code argp))
@@ -366,13 +366,13 @@
 ;(display (program-list-compile block-test))
 ;(newline)
 
-;(define (main args)
- ; (let ((program-list (s-read (cadr args))))
-  ;  (set! out-p (open-output-file (caddr args)))
-   ; (dprint "require \"lib/lib.rb\"\n")
-    ;(l2r program-list)))
+(define (main args)
+  (let ((program-list (s-read (cadr args))))
+    (set! out-p (open-output-file (caddr args)))
+    (dprint "require \"lib/lib.rb\"\n")
+    (l2r program-list)))
 (define (l2r-test t-list)
   (dprint "require \"lib/lib.rb\"\n")
   (l2r t-list))
-(l2r-test reverse-test)
-(lib-compile)
+;(l2r-test reverse-test)
+;(lib-compile)

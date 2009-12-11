@@ -1,0 +1,37 @@
+(def (object? code)
+  (or (string? code) (number? code)
+      (eq? nil code) (symbol? code)
+      (eq? true code) (eq? false code)))
+
+(def (run? code)
+  (& (pair? code) (symbol? (car code))))
+
+(def (tostr code)
+     code.to_s)
+(def (argp_print argp)
+     (if argp
+	 ""
+	 "\n"))
+(def (compile code argp asm_str)
+     (cond ((object? code)
+	    (+ asm_str code.to_s (argp_print argp)))
+	   ((run? code)
+	    (+ (tostr (car code)) 
+	       (if (null? (cdr code))
+		   "()"
+		   (args_compile (cdr code) argp))))
+	   
+	   )
+     )
+(def (args_cdr_compile args_list)
+     (if (null? args_list)
+	 ""
+	 (+ ", " (compile (car args_list) true "")
+	    (args_cdr_compile (cdr args_list)))))
+	 
+(def (args_compile args_list argp)
+     (+ "(" (compile (car args_list) true "")
+	(args_cdr_compile (cdr args_list))
+	")" (argp_print argp)))
+	
+(puts (compile '(puts (+ 20 30)) false ""))
