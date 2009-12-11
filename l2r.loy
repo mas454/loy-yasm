@@ -6,32 +6,64 @@
 (def (run? code)
   (& (pair? code) (symbol? (car code))))
 
+(def (set? exp)
+     (tagged_list? exp '=))
+
+(def (tagged_list? exp tag)
+  (if (pair? exp)
+      (eq? (car exp) tag)
+      false))
+
+(def (cons? code)
+  (tagged_list? code 'cons))
+
 (def (tostr code)
      code.to_s)
 (def (argp_print argp)
      (if argp
 	 ""
 	 "\n"))
-(def (compile code argp asm_str)
+
+(def (cadr code)
+     (car (cdr code)))
+
+(def (caddr code)
+     (car (cdr (cdr code))))
+(def (compile code argp)
      (cond ((object? code)
-	    (+ asm_str code.to_s (argp_print argp)))
+	    (+ "" code.to_s (argp_print argp)))
+	   ((set? code)
+	    (+ "" (cadr code) " = " (compile (caddr code) false)))
+	   ((cons? code)
+	    (+ "[" (compile (cadr code) true) ","
+	       (compile (caddr code) true) "]" (argp_print argp)))
+	   ((car? code)
+	    (+ "" (compile (cadr code) true) "[0]" (argp_print argp)))
+	   ((cdr? code)
+	    (+ "" (compile (cadr code) true) "[1]" (argp_print argp)))
 	   ((run? code)
-	    (+ (tostr (car code)) 
+	    (+ "" (car code) 
 	       (if (null? (cdr code))
 		   "()"
 		   (args_compile (cdr code) argp))))
 	   
 	   )
      )
+
 (def (args_cdr_compile args_list)
      (if (null? args_list)
 	 ""
-	 (+ ", " (compile (car args_list) true "")
+	 (+ ", " (compile (car args_list) true)
 	    (args_cdr_compile (cdr args_list)))))
 	 
 (def (args_compile args_list argp)
-     (+ "(" (compile (car args_list) true "")
+     (+ "(" (compile (car args_list) true)
 	(args_cdr_compile (cdr args_list))
 	")" (argp_print argp)))
-	
-(puts (compile '(puts (+ 20 30)) false ""))
+(def (car? code)
+  (tagged_list? code 'car))
+
+(def (cdr? code)
+  (tagged_list? code 'cdr))
+
+(puts (compile '(car (cons 10 (cons 20 nil))) false))
