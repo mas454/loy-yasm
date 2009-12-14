@@ -122,7 +122,6 @@
 	((infix? code)
 	 (infix-compile (car code) (cdr code) argp))
 	((binfix? code)
-	 ;(display (car code))(newline)
 	 (binfix-compile (car code) (cadr code) (caddr code) argp))
 	((run? code)
 	 (list (list 'putobject (list 'quote (car code)) #t)
@@ -142,8 +141,10 @@
 
 (define (symbol-printx sym)
   (dprint ":" sym))
+
 (define (infix? exp)
   (memq (car exp) '(+ - * / % **  ^ & or)))
+
 (define (binfix? exp)
   (memq (car exp) '(< > <= ==)))
 (define (binfix-compile inf arg1 arg2 argp)

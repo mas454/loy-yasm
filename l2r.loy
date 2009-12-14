@@ -50,6 +50,9 @@
 (def (caddr code)
      (car (cdr (cdr code))))
 
+(def (cdadr code)
+     (cdr (car (cdr code))))
+
 (def (compile code argp)
      (cond ((object? code)
 	    (+ "" code.to_s (argp_print argp)))
@@ -74,14 +77,56 @@
 	    (def_compile (cdr code)))
 	   ((lambda? code)
 	    (lambda_compile (cdr code) argp))
+	   ((begin? code)
+	    (program_list_compile (cdr code)))
+	   ((infix? code)
+	    (infix_compile (car code) (cdr code) argp))
+	   ((binfix? code)
+	    (binfix_compile (car code) (cadr code) (caddr code) argp))
 	   ((run? code)
-	    (+ "" (car code) 
-	       (if (null? (cdr code))
-		   "()"
-		   (args_compile (cdr code) argp))))
+	    (run_compile code argp))
 	   
 	   )
      )
+
+(def (run_compile code argp)
+     (+ "" (car code) 
+	(if (null? (cdr code))
+	    "()"
+	    (if (& (null? (cddr code))
+		     (tagged_list? (cadr code) 'block))
+		(+ "()" (block_compile (cdadr code)))
+		(args_compile (cdr code) argp)))))
+
+(def (memq sym lis)
+     (cond 
+      ((null? lis) 
+       false)
+      ((eq? sym (car lis))
+       lis)
+      (else
+       (memq sym (cdr lis)))))
+	 
+(def (infix? exp)
+  (memq (car exp) '(+ - * / % **  ^ & or)))
+(def (begin? exp)
+  (tagged_list? exp 'begin))
+
+(def (infix_compile inf arg_list argp)
+     (+ (compile (car arg_list) true)
+	(string_list_append 
+	 (map (lambda (arg)
+		(+ " " inf " "
+		   (compile arg true))) (cdr arg_list)))
+	(argp_print argp)))
+
+(def (binfix? exp)
+     (memq (car exp) '(< > <= ==)))
+
+(def (binfix_compile inf arg1 arg2 argp)
+     (+ (compile arg1 true)
+	" " inf " " 
+	(compile arg2 argp)))
 
 (def (def_arg_string lis)
      (if (not (null? lis))
@@ -97,8 +142,8 @@
 	      (program_list_compile (cddr code))
 	      "end\n\n"))    
 	 (begin
-	   (+ "def " (car code) "("
-	      (def_arg_string (cdar code) ")\n")
+	   (+ "def " (caar code) "("
+	      (def_arg_string (cdar code)) ")\n"
 	      (program_list_compile (cdr code))
 	      "end\n\n"))))
 		  
@@ -122,6 +167,10 @@
      (+ "lambda {|" (def_arg_string (car lam_list))
 	"|\n" (program_list_compile (cdr lam_list))
 	"}" (argp_print argp)))
+(def (block_compile bl_list)
+     (+ " {|"
+	(def_arg_string (car bl_list)) "|\n"
+	(program_list_compile (cdr bl_list)) "}\n"))
 
 (def (quote? exp)
   (tagged_list? exp 'quote))
@@ -183,8 +232,28 @@
 (= lambda_test '(
 		      (= lam (lambda (a b)
 				 (puts a b)))
-		      ;(lam.call 10 20)
+		      (|"lam.call"| 10 20)
 		      )
 )
-(display (program_list_compile lambda_test))
+
+(= def_test '(
+	      (def (add a b)
+		   (puts a b))
+	      (add 2000 30)
+	      )
+)
+(= infix_test '(
+		(puts (+ 10 20 30 40))
+		)
+)
+(= binfix_test '(
+		 (puts (< 20 30))
+		 )
+)
+(= block1_test '(
+		 (|"3.times"| (block (i) (p i)))
+		 )
+)
+		 
+(eval (program_list_compile block1_test))
 ;(puts (string_list_append '("abc" "def" "hij")))

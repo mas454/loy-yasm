@@ -126,7 +126,7 @@ class Reader
       end
       str.concat(@ch)
     end
-    str.to_sym
+    ("\""+str+"\"").to_sym
   end
   def makeList
     getChar
