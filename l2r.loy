@@ -72,8 +72,8 @@
 	    (if_compile (cdr code) argp))
 	   ((def? code)
 	    (def_compile (cdr code)))
-	   ((->? code)
-	    (list '-> (list 'quote (cdr code)) argp))
+	   ((lambda? code)
+	    (lambda_compile (cdr code) argp))
 	   ((run? code)
 	    (+ "" (car code) 
 	       (if (null? (cdr code))
@@ -83,7 +83,7 @@
 	   )
      )
 
-(def (def_arg_string args)
+(def (def_arg_string lis)
      (if (not (null? lis))
 	 (begin
 	   (+ "" (car lis)
@@ -113,6 +113,15 @@
 	  (quote_compile (car lis))
 	  (quote_compile (cdr lis))))))
 
+(def (lambda? code)
+  (or 
+   (tagged_list? code 'lambda)))
+   ;(tagged_list? code '->)))
+
+(def (lambda_compile lam_list argp)
+     (+ "lambda {|" (def_arg_string (car lam_list))
+	"|\n" (program_list_compile (cdr lam_list))
+	"}" (argp_print argp)))
 
 (def (quote? exp)
   (tagged_list? exp 'quote))
@@ -161,7 +170,8 @@
 			    (program_list_compile (cdr con)))))
 		 (cdr code))))
 	"end" (argp_print argp)))
-
+(def (def? exp)
+  (tagged_list? exp 'def))
 (def (program_list_compile code_list)
   (string_list_append (map (lambda (a)
 			     (compile a false)) code_list)))
@@ -170,6 +180,11 @@
 		    (false "hello")
 		    (else (puts 3004)))
   )
-
-(eval (compile cond_test  false))
+(= lambda_test '(
+		      (= lam (lambda (a b)
+				 (puts a b)))
+		      ;(lam.call 10 20)
+		      )
+)
+(display (program_list_compile lambda_test))
 ;(puts (string_list_append '("abc" "def" "hij")))

@@ -192,6 +192,7 @@
   (or 
    (tagged-list? code 'lambda)
    (tagged-list? code '->)))
+
 (define (def code)
   (if (symbol? (car code))
       (begin
