@@ -194,8 +194,26 @@
 	 
 (def (args_compile args_list argp)
      (+ "(" (compile (car args_list) true)
-	(args_cdr_compile (cdr args_list))
-	")" (argp_print argp)))
+	;(args_cdr_compile (cdr args_list))
+	(string_list_append
+	 (map (lambda (code)
+		(if (tagged_list? code 'block)
+		    ""
+		    (+ ", " (compile code true)))) (cdr args_list)))
+	")" 
+	(let ((bloc (block? args_list)))
+	  (if (null? bloc)
+	      ""
+	      (block_compile bloc)))
+	(argp_print argp)))
+
+(def (block? lis)
+  (if (null? lis)
+      '()
+      (if (tagged_list? (car lis) 'block)
+	  (cdar lis)
+	  (block? (cdr lis)))))
+
 (def (car? code)
   (tagged_list? code 'car))
 
@@ -255,5 +273,5 @@
 		 )
 )
 		 
-(eval (program_list_compile block1_test))
+(eval (program_list_compile infix_test))
 ;(puts (string_list_append '("abc" "def" "hij")))
