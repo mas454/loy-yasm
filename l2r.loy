@@ -71,7 +71,9 @@
 	   ((if? code)
 	    (if_compile (cdr code) argp))
 	   ((def? code)
-	    (list 'def (list 'quote (cdr code))))
+	    (def_compile (cdr code)))
+	   ((->? code)
+	    (list '-> (list 'quote (cdr code)) argp))
 	   ((run? code)
 	    (+ "" (car code) 
 	       (if (null? (cdr code))
@@ -81,6 +83,25 @@
 	   )
      )
 
+(def (def_arg_string args)
+     (if (not (null? lis))
+	 (begin
+	   (+ "" (car lis)
+	      (string_list_append (map (-> (code)
+					   (+ ", " code)) (cdr lis)))))))
+(def (def_compile code)
+     (if (symbol? (car code))
+	 (begin
+	   (+ "def " (car code) "("
+	      (def_arg_string (cadr code)) ")\n"
+	      (program_list_compile (cddr code))
+	      "end\n\n"))    
+	 (begin
+	   (+ "def " (car code) "("
+	      (def_arg_string (cdar code) ")\n")
+	      (program_list_compile (cdr code))
+	      "end\n\n"))))
+		  
 (def (quote_compile lis)
   (cond 
    ((null? lis) nil)
