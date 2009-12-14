@@ -7,7 +7,7 @@
 (def (map fn lis)
      (if (null? lis)
 	 nil
-	 (cons (fn.call (car lis)) (cdr lis))))
+	 (cons (fn.call (car lis)) (map fn (cdr lis)))))
 
 (def (object? code)
   (or (string? code) (number? code)
@@ -35,6 +35,12 @@
 	 ""
 	 "\n"))
 
+(def (caar code)
+     (car (car code)))
+
+(def (cdar code)
+     (cdr (car code)))
+
 (def (cddr code)
      (cdr (cdr code)))
 
@@ -43,9 +49,14 @@
 
 (def (caddr code)
      (car (cdr (cdr code))))
+
 (def (compile code argp)
      (cond ((object? code)
 	    (+ "" code.to_s (argp_print argp)))
+	   ((quote? code)
+	    (if (symbol? (cadr code)) 
+		(+ ":" (tostr (cadr code)))
+		(compile (quote_compile (cadr code)) argp)))
 	   ((set? code)
 	    (+ "" (cadr code) " = " (compile (caddr code) false)))
 	   ((cons? code)
@@ -55,8 +66,12 @@
 	    (+ "" (compile (cadr code) true) "[0]" (argp_print argp)))
 	   ((cdr? code)
 	    (+ "" (compile (cadr code) true) "[1]" (argp_print argp)))
+	   ((cond? code)
+	    (cond_compile (cdr code) argp))
 	   ((if? code)
 	    (if_compile (cdr code) argp))
+	   ((def? code)
+	    (list 'def (list 'quote (cdr code))))
 	   ((run? code)
 	    (+ "" (car code) 
 	       (if (null? (cdr code))
@@ -65,6 +80,21 @@
 	   
 	   )
      )
+
+(def (quote_compile lis)
+  (cond 
+   ((null? lis) nil)
+   ((symbol? lis)
+    (list 'quote lis))
+   ((object? lis) lis)
+   (else
+    (list 'cons 
+	  (quote_compile (car lis))
+	  (quote_compile (cdr lis))))))
+
+
+(def (quote? exp)
+  (tagged_list? exp 'quote))
 
 (def (if? exp)
   (tagged_list? exp 'if))
@@ -92,6 +122,7 @@
 
 (def (cdr? code)
   (tagged_list? code 'cdr))
+
 (def (cond? code)
   (tagged_list? code 'cond))
 
@@ -109,6 +140,15 @@
 			    (program_list_compile (cdr con)))))
 		 (cdr code))))
 	"end" (argp_print argp)))
-	
-;(puts (compile '(if true "hello" "world") false))
-(puts (string_list_append '("abc" "def" "hij")))
+
+(def (program_list_compile code_list)
+  (string_list_append (map (lambda (a)
+			     (compile a false)) code_list)))
+
+(= cond_test '(cond (false (puts "hello, world"))
+		    (false "hello")
+		    (else (puts 3004)))
+  )
+
+(eval (compile cond_test  false))
+;(puts (string_list_append '("abc" "def" "hij")))
