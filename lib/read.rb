@@ -98,16 +98,22 @@ class Reader
     while @indexOfLine <= @lineLength
       if @ch == "(" || @ch == ")"
 	break
+      elsif @ch == "."
+        b = true
       elsif @ch == " "
 	break
-      elsif /[^0-9]/ =~  @ch && ch != '-'
+      elsif /[^0-9]/ =~  @ch && @ch != '-'
 	@indexOfLine -= 1
 	return makeSymbolInternal(str)
       end
       str.concat(@ch)
       getChar
     end
-    str.to_i
+    if b
+     str.to_f
+    else
+     str.to_i
+    end
   end
   def makeMinusNumber
     nch = @line[@indexOfLine].chr

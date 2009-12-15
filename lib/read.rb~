@@ -22,6 +22,7 @@ class Reader
        end
        i += 1
        if lparen == 0
+          sexp = sexp + str
           return sexp
        end
       end
@@ -97,6 +98,8 @@ class Reader
     while @indexOfLine <= @lineLength
       if @ch == "(" || @ch == ")"
 	break
+      elsif @ch == "."
+        b = true
       elsif @ch == " "
 	break
       elsif /[^0-9]/ =~  @ch && ch != '-'
@@ -106,7 +109,11 @@ class Reader
       str.concat(@ch)
       getChar
     end
-    str.to_i
+    if b
+     str.to_f
+    else
+     str.to_i
+    end
   end
   def makeMinusNumber
     nch = @line[@indexOfLine].chr
