@@ -16,7 +16,7 @@
 (= S_READER (Reader.new))
 
 (def read (io)
-     	 (S_READER io))
+     	 (S_READER.read io))
 
 (def (open_input_file path)
      (open path "r"))
@@ -28,3 +28,22 @@
 	  (fn.call (car lis))
 	  (map fn (cdr lis)))))
 
+(def (append *lis)
+     (= app_list nil)
+     (lis.map (block (li)
+		      (= app_list (cons li app_list))))
+     app_list)
+
+(def append2 (xs ys)
+    (if (null? xs)
+        ys
+      (cons (car xs) (append2 (cdr xs) ys))))
+
+(def (reverse lis)
+     (= rev (lambda (lis retlis)
+	      (if (null? lis)
+		  retlis
+		(rev.call (cdr lis) (cons (car lis) retlis)))))
+     (rev.call lis nil))
+	      
+		

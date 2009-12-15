@@ -13,10 +13,9 @@
 (def null? (a)
      (a.nil?))
 
-(= S_READER (Reader.new))
 
-(def read (io)
-     	 (S_READER io))
+
+
 
 (def (open_input_file path)
      (open path "r"))
@@ -33,9 +32,6 @@
      (lis.map (block (li)
 		      (= app_list (cons li app_list))))
      app_list)
-
-(def (append-list lis)
-     (cond (
 
 (def append2 (xs ys)
     (if (null? xs)

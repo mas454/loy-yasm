@@ -48,9 +48,11 @@ end
 def symbol?(o)
  o.kind_of?(Symbol)
 end
+
 def pair?(exp)
  exp.kind_of?(Array) 
 end
+
 def eq?(a, b)
  a==b
 end
@@ -58,3 +60,10 @@ def null?(a)
  a.nil?()
 end
 
+S_READER = Reader.new
+
+def read(i = STDIN)
+ puts "read method"
+ str=S_READER.read i
+ S_READER.lex(str)
+end

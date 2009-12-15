@@ -85,7 +85,10 @@
 	    (binfix_compile (car code) (cadr code) (caddr code) argp))
 	   ((run? code)
 	    (run_compile code argp))
-	   
+	   (else
+	    (display "compile error ")
+	    (display code)
+	    (exit 1))
 	   )
      )
 
@@ -272,6 +275,14 @@
 		 (|"3.times"| (block (i) (p i)))
 		 )
 )
-		 
-(eval (program_list_compile infix_test))
+(def (quit)
+ (exit 0))
+(def (repl)
+     (loop (block ()
+	    (display "\n>")
+	    (= expr (compile (read) false))
+	    (display (eval expr TOPLEVEL_BINDING))
+	    (display "\n"))))
+;(eval (program_list_compile infix_test))
+(repl)
 ;(puts (string_list_append '("abc" "def" "hij")))

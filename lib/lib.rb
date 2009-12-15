@@ -20,11 +20,6 @@ def null?(a)
 a.nil?()
 end
 
-S_READER = Reader.new()
-def read(io)
-S_READER(io)
-end
-
 def open_input_file(path)
 open(path,"r")
 end

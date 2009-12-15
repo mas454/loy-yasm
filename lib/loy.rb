@@ -60,3 +60,9 @@ def null?(a)
  a.nil?()
 end
 
+S_READER = Reader.new
+
+def read(i = STDIN)
+ str=S_READER.read i
+ S_READER.lex(str)
+end

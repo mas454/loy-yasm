@@ -7,23 +7,28 @@ class Reader
   def initialize
     init
   end
-  def read(i)
-    str = ""
+  def read(io)
+    sexp = ""
     lparen = 0
-    while(!i.eof?)
-      ch = i.getc.chr #.id2name
-      if ch == "("
+    while(!io.eof?)
+      #ch = i.getc.chr #.id2name
+      str = io.gets.chop!
+      i = 0
+      while str[i] != nil
+       if str[i] == "("
         lparen += 1
-      elsif ch == ")"
+       elsif str[i] == ")"
         lparen -= 1
-        str.concat(")")
-        if lparen == 0
-          return str
-        end
+       end
+       i += 1
+       if lparen == 0
+          sexp = sexp + str
+          return sexp
+       end
       end
-      str = str.concat(ch)
+      sexp=sexp+str+" "
     end
-    str
+    sexp
   end
   def lex(s="")
     @indexOfLine = 0;
@@ -126,7 +131,7 @@ class Reader
       end
       str.concat(@ch)
     end
-    ("\""+str+"\"").to_sym
+    str.to_sym
   end
   def makeList
     getChar

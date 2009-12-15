@@ -350,7 +350,7 @@
 	    (reverse ls1)
 	    (loop (cons s ls1) (read)))))))
 (define out-p (open-output-file "l2r-test.rb"))
-;(define out-p '())
+(define out-p '())
 (define (lib-compile)
   (let ((program-list (s-read "lib/lib.loy")))
     (set! out-p (open-output-file "lib/lib.rb"))
