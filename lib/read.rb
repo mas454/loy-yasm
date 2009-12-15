@@ -95,10 +95,11 @@ class Reader
   
   def makeNumber
     str = ""
+    b = false
     while @indexOfLine <= @lineLength
       if @ch == "(" || @ch == ")"
 	break
-      elsif @ch == "."
+      elsif (@ch == ".") & !b
         b = true
       elsif @ch == " "
 	break
