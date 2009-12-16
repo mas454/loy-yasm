@@ -1,7 +1,7 @@
 require("lispu.rb")
 #puts "\"abc\"".to_sym.equal?(:abc)
 puts "print-scm".to_sym
-eval "x = 20;puts x"
+puts ARGV[0] == nil
 
 #puts RubyVM::InstructionSequence.compile_file("rbtest.rb").disasm
 
