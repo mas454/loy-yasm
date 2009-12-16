@@ -98,14 +98,12 @@
 	    (display "compile error ")
 	    (display code) 
 	    (newline)
-	    (exit 1))
-	   )
-     )
+	    (exit 1))))
 
 (def (run_compile code argp)
      (+ "" (car code) 
 	(if (null? (cdr code))
-	    "()"
+	    (+ "()" (argp_print argp))
 	    (if (& (null? (cddr code))
 		     (tagged_list? (cadr code) 'block))
 		(+ "()" (block_compile (cdadr code)))
@@ -245,9 +243,6 @@
 	    ""
 	   (string_list_append 
 	    (map (lambda (con)
-		   ;(display (cdr con))
-		   ;(newline)
-		   ;(newline)
 		     (if (eq? 'else (car con))
 			 (+ "else\n"
 			    (program_list_compile (cdr con)))
@@ -276,27 +271,17 @@
 (= cond_test '((cond (false (puts "hello, world"))
 		    (false "hello")
 		    (else (puts 3004)))))
-(= lambda_test '(
-		      (= lam (lambda (a b)
-				 (puts a b)))
-		      (|"lam.call"| 10 20)
-		      )
-)
+(= lambda_test '((= lam (lambda (a b)
+			  (puts a b)))
+		      (lamcall lam 10 20)))
 
-(= def_test '(
-	      (def (add a b)
+(= def_test '((def (add a b)
 		   (puts a b))
-	      (add 2000 30)
-	      )
-)
+	      (add 2000 30)))
 (= infix_test '(
-		(puts (+ 10 20 30 40))
-		)
-)
+		(puts (+ 10 20 30 40))))
 (= binfix_test '(
-		 (puts (< 20 30))
-		 )
-)
+		 (puts (< 20 30))))
 ;(= block1_test '(
 	;	 (3.times (block (i) (p i)))
 		; )
@@ -318,11 +303,10 @@
 	    (puts sexp.to_s)
 	    (newline)
 	    (= expr (compile sexp false))
-	    ;(display expr)
-	    ;(newline)
+	    (display expr)
+	    (newline)
 	    (display (eval expr TOPLEVEL_BINDING))
-            (newline)
-	    )))
+            (newline))))
 ;(= test '('(cond (false (puts "ab")))))
 
 ;(eval (program_list_compile test))
