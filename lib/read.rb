@@ -181,6 +181,7 @@ class Reader
     while @indexOfLine < @lineLength
       getChar
       if @ch == "\""
+        getChar
 	break
       end
       str.concat(@ch)

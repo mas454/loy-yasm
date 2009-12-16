@@ -99,7 +99,7 @@ class Reader
     while @indexOfLine <= @lineLength
       if @ch == "(" || @ch == ")"
 	break
-      elsif(@ch == "." & !b)
+      elsif (@ch == ".") & !b
         b = true
       elsif @ch == " "
 	break

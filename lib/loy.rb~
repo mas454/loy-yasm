@@ -12,8 +12,10 @@ def putlist(a, out)
  if a.kind_of?(Array)
   out.print '('
   putlist_loop a, out
+ elsif a.kind_of?(String)
+  out.print '"'+ a + '"'
  else
-  print a
+  out.print a
  end
 end
 
@@ -63,7 +65,6 @@ end
 S_READER = Reader.new
 
 def read(i = STDIN)
- puts "read method"
  str=S_READER.read i
  S_READER.lex(str)
 end

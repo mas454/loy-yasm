@@ -13,7 +13,7 @@ def putlist(a, out)
   out.print '('
   putlist_loop a, out
  else
-  print a
+  out.print a
  end
 end
 
