@@ -171,9 +171,15 @@ class Reader
   def makeQuote
     top = Array.new 2
     list = top
+    qulist = Array.new 2
     list[0] = :quote
     getChar
-    list[1] = getSexp
+    sexp = getSexp
+    #if sexp.kind_of?(Array) 
+     list[1] = [sexp, nil]
+    #else
+     #list[1] = sexp
+    #end
     top
   end
   def makeString

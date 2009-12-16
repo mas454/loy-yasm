@@ -8,12 +8,14 @@ def display(sexp, out=STDOUT)
  putlist sexp, out
 end
 
+def newline(sexp, out=STDOUT)
+ out.print "\n"
+end
+
 def putlist(a, out)
  if a.kind_of?(Array)
   out.print '('
   putlist_loop a, out
- elsif a.kind_of?(String)
-  out.print '"'+ a + '"'
  else
   out.print a
  end

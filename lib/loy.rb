@@ -8,6 +8,10 @@ def display(sexp, out=STDOUT)
  putlist sexp, out
 end
 
+def newline(out=STDOUT)
+ out.print "\n"
+end
+
 def putlist(a, out)
  if a.kind_of?(Array)
   out.print '('
