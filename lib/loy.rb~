@@ -8,7 +8,7 @@ def display(sexp, out=STDOUT)
  putlist sexp, out
 end
 
-def newline(sexp, out=STDOUT)
+def newline(out=STDOUT)
  out.print "\n"
 end
 
@@ -48,7 +48,9 @@ def list(*b)
  list_loop(b,0)
 end
 
-
+def car(a)
+ a[0]
+end
 def symbol?(o)
  o.kind_of?(Symbol)
 end

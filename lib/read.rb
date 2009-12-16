@@ -19,14 +19,18 @@ class Reader
         lparen += 1
        elsif str[i] == ")"
         lparen -= 1
+       elsif str[i] == ";"
+        break
        end
        i += 1
-       if lparen == 0
+       if (lparen == 0) & (str[i-1] != "'")
           sexp = sexp + str
           return sexp
        end
       end
-      sexp=sexp+str+" "
+      if !(str[i] == ";")
+        sexp=sexp+str+" "
+      end
     end
     sexp
   end
@@ -186,7 +190,10 @@ class Reader
     str = ""
     while @indexOfLine < @lineLength
       getChar
-      if @ch == "\""
+      if @ch == "\\"
+          str.concat(@ch)
+          getChar
+      elsif @ch == "\""
         getChar
 	break
       end

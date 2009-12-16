@@ -52,14 +52,19 @@
 (def (cdadr code)
      (cdr (car (cdr code))))
 
+(def (wqu)
+     "\\\"")
+
 (def (compile code argp)
      (cond ((string? code)
-	    (+ "\\\"" code "\\\"" (argp_print argp)))
+	    (+ (wqu) code (wqu) (argp_print argp)))
 	   ((object? code)
 	    (+ "" code.to_s (argp_print argp)))
 	   ((quote? code)
-	    (cond ((symbol? (cadr code)) 
-		   (+ ":" (cadr code)))
+	    (cond ((symbol? (cadr code))
+		   (if (eq? (cadr code) '=)
+		       (+ ":" (wqu) "=" (wqu))
+		     (+ ":" (cadr code))))
 		  (else
 		   (compile (quote_compile (cadr code)) argp))))
 	   ((set? code)
@@ -75,6 +80,8 @@
 	    (cond_compile (cdr code) argp))
 	   ((if? code)
 	    (if_compile (cdr code) argp))
+	   ((let? code)
+	    (compile (let_compile (cdr code)) argp))
 	   ((def? code)
 	    (def_compile (cdr code)))
 	   ((lambda? code)
@@ -89,7 +96,8 @@
 	    (run_compile code argp))
 	   (else
 	    (display "compile error ")
-	    (display code) (newline)
+	    (display code) 
+	    (newline)
 	    (exit 1))
 	   )
      )
@@ -134,7 +142,8 @@
 	(compile arg2 argp)))
 
 (def (def_arg_string lis)
-     (if (not (null? lis))
+     (if (null? lis)
+	 ""
 	 (begin
 	   (+ "" (car lis)
 	      (string_list_append (map (lambda (code)
@@ -153,15 +162,16 @@
 	      "end\n\n"))))
 		  
 (def (quote_compile lis)
-  (cond 
-   ((null? lis) nil)
-   ((symbol? lis)
-    (list 'quote lis))
-   ((object? lis) lis)
-   (else
-    (list 'cons 
-	  (quote_compile (car lis))
-	  (quote_compile (cdr lis))))))
+     (cond 
+      ((null? lis) nil)
+      ((symbol? lis)
+       (list 'quote lis))
+      ((string? lis) lis)
+      ((object? lis) lis)
+      (else
+       (list 'cons 
+	     (quote_compile (car lis))
+	     (quote_compile (cdr lis))))))
 
 (def (lambda? code)
   (or 
@@ -199,7 +209,7 @@
 	 
 (def (args_compile args_list argp)
      (+ "(" (compile (car args_list) true)
-	;(args_cdr_compile (cdr args_list))
+	
 	(string_list_append
 	 (map (lambda (code)
 		(if (tagged_list? code 'block)
@@ -235,9 +245,9 @@
 	    ""
 	   (string_list_append 
 	    (map (lambda (con)
-		   (display (cdr con))
-		   (newline)
-		   (newline)
+		   ;(display (cdr con))
+		   ;(newline)
+		   ;(newline)
 		     (if (eq? 'else (car con))
 			 (+ "else\n"
 			    (program_list_compile (cdr con)))
@@ -245,16 +255,27 @@
 			    (program_list_compile (cdr con)))))
 		 (cdr code))))
 	"end" (argp_print argp)))
+(def (let? exp)
+     (tagged_list? exp 'let))
+(def (let_compile lis)
+     (= car_lam (lambda (a)
+		  (car a)))
+     (= cadr_lam (lambda (a)
+		  (cadr a)))
+  (append2 (list 'lamcall (append2 
+			   (list 'lambda (map car_lam (car lis))) (cdr lis)))
+	    (map cadr_lam (car lis))))
+
 (def (def? exp)
   (tagged_list? exp 'def))
+
 (def (program_list_compile code_list)
   (string_list_append (map (lambda (a)
 			     (compile a false)) code_list)))
 
 (= cond_test '((cond (false (puts "hello, world"))
 		    (false "hello")
-		    (else (puts 3004))))
-  )
+		    (else (puts 3004)))))
 (= lambda_test '(
 		      (= lam (lambda (a b)
 				 (puts a b)))
@@ -302,6 +323,8 @@
 	    (display (eval expr TOPLEVEL_BINDING))
             (newline)
 	    )))
-;(eval (program_list_compile cond_test))
-(l2r_compile (open "l2r.loy" "r") (open "testl2r.rb" "w"))
-;(repl)
+;(= test '('(cond (false (puts "ab")))))
+
+;(eval (program_list_compile test))
+;(l2r_compile (open "l2r.loy" "r") (open "testl2r.rb" "w"))
+(repl)

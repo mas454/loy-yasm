@@ -14,19 +14,24 @@ class Reader
       #ch = i.getc.chr #.id2name
       str = io.gets.chop!
       i = 0
+      puts str
       while str[i] != nil
        if str[i] == "("
         lparen += 1
        elsif str[i] == ")"
         lparen -= 1
+       elsif str[i] == ";"
+        break
        end
        i += 1
-       if lparen == 0
+       if (lparen == 0) & (str[i-1] != "'")
           sexp = sexp + str
           return sexp
        end
       end
-      sexp=sexp+str+" "
+      if !(str[i] == ";")
+        sexp=sexp+str+" "
+      end
     end
     sexp
   end
@@ -175,20 +180,21 @@ class Reader
     list[0] = :quote
     getChar
     sexp = getSexp
-    if sexp.kind_of?(Array) 
-     qulist[0] = sexp
-     qulist[1] = nil
+    #if sexp.kind_of?(Array) 
      list[1] = [sexp, nil]
-    else
-     list[1] = sexp
-    end
+    #else
+     #list[1] = sexp
+    #end
     top
   end
   def makeString
     str = ""
     while @indexOfLine < @lineLength
       getChar
-      if @ch == "\""
+      if @ch == "\\"
+          str.concat(@ch)
+          getChar
+      elsif @ch == "\""
         getChar
 	break
       end
