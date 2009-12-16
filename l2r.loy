@@ -297,10 +297,10 @@
 		 (puts (< 20 30))
 		 )
 )
-(= block1_test '(
-		 (|"3.times"| (block (i) (p i)))
-		 )
-)
+;(= block1_test '(
+	;	 (3.times (block (i) (p i)))
+		; )
+;)"
 (def (quit)
  (exit 0))
 
@@ -326,5 +326,5 @@
 ;(= test '('(cond (false (puts "ab")))))
 
 ;(eval (program_list_compile test))
-;(l2r_compile (open "l2r.loy" "r") (open "testl2r.rb" "w"))
-(repl)
+(l2r_compile (open "l2r.loy" "r") (open "testl2r.rb" "w"))
+;(repl)
