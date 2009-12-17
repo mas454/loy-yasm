@@ -53,7 +53,7 @@
      (cdr (car (cdr code))))
 
 (def (wqu)
-     "\\\"")
+     "\"")
 
 (def (compile code argp)
      (cond ((string? code)
@@ -62,9 +62,11 @@
 	    (+ "" code.to_s (argp_print argp)))
 	   ((quote? code)
 	    (cond ((symbol? (cadr code))
-		   (if (eq? (cadr code) '=)
-		       (+ ":" (wqu) "=" (wqu))
-		     (+ ":" (cadr code))))
+		   ;(cond ((eq? (cadr code) '=)
+			;  (+ ":" (wqu) "=" (wqu)))
+			 ;((eq? (cadr 
+		     ;(+ ":" (cadr code))))
+		   (+ ":" (wqu) (cadr code) (wqu)))
 		  (else
 		   (compile (quote_compile (cadr code)) argp))))
 	   ((set? code)
@@ -173,8 +175,8 @@
 
 (def (lambda? code)
   (or 
-   (tagged_list? code 'lambda)))
-   ;(tagged_list? code '->)))
+   (tagged_list? code 'lambda)
+   (tagged_list? code '->)))
 
 (def (lambda_compile lam_list argp)
      (+ "lambda {|" (def_arg_string (car lam_list))
@@ -290,7 +292,8 @@
  (exit 0))
 
 (def (l2r_compile in_file out_file)
-    (loop (block ()
+     (display "require 'lib/lib.rb'\n" out_file)
+     (loop (block ()
 		 (= ruby_str (compile (read in_file) false))
 		 ;(eval ruby_str TOPLEVEL_BINDING)
 		 (display ruby_str out_file)
