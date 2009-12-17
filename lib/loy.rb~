@@ -26,7 +26,12 @@ def putlist_loop(a, out)
     putlist a[0], out
     out.print ' '
     if a[1].kind_of?(Array)
-    putlist_loop(a[1], out)
+     putlist_loop(a[1], out)
+    else
+      out.print ". "
+      out.print a[1]
+      out.print ")"
+    end
   else
     putlist a[0], out
     out.print ")"
@@ -36,6 +41,13 @@ end
 def lamcall(lam, *args)
  lam.call(*args)
 end
+def list_loopmul(lis, num)
+ if lis.length()==num+1
+  lis[num]
+ else
+  [lis.[](num),list_loop(lis,num+1)]
+ end 
+end
 
 def list_loop(lis, num)
  if lis.length()==num
@@ -43,6 +55,10 @@ def list_loop(lis, num)
  else
   [lis.[](num),list_loop(lis,num+1)]
  end
+end
+
+def listm(*b)
+ list_loopmul(b, 0)
 end
 
 def list(*b)

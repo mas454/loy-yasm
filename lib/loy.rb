@@ -41,6 +41,13 @@ end
 def lamcall(lam, *args)
  lam.call(*args)
 end
+def list_loopmul(lis, num)
+ if lis.length()==num+1
+  lis[num]
+ else
+  [lis.[](num),list_loopmul(lis,num+1)]
+ end 
+end
 
 def list_loop(lis, num)
  if lis.length()==num
@@ -48,6 +55,10 @@ def list_loop(lis, num)
  else
   [lis.[](num),list_loop(lis,num+1)]
  end
+end
+
+def listm(*b)
+ list_loopmul(b, 0)
 end
 
 def list(*b)
