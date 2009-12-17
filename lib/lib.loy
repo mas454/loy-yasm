@@ -6,16 +6,13 @@
      (o.kind_of? Numeric))
 (def symbol? (o)
      (o.kind_of? Symbol))
-
+(def pair? (o)
+     (o.kind_of? Array))
 (def eq? (a b)
      (a.equal? b))
 
 (def null? (a)
      (a.nil?))
-
-
-
-
 
 (def (open_input_file path)
      (open path "r"))
@@ -44,5 +41,33 @@
 		  retlis
 		(rev.call (cdr lis) (cons (car lis) retlis)))))
      (rev.call lis nil))
-	      
-		
+
+(def (newarray *arr)
+     arr)
+
+(def (memq sym lis)
+     (cond 
+      ((null? lis) 
+       false)
+      ((eq? sym (car lis))
+       lis)
+      (else
+       (memq sym (cdr lis)))))
+
+(def (caar code)
+     (car (car code)))
+
+(def (cdar code)
+     (cdr (car code)))
+
+(def (cddr code)
+     (cdr (cdr code)))
+
+(def (cadr code)
+     (car (cdr code)))
+
+(def (caddr code)
+     (car (cdr (cdr code))))
+
+(def (cdadr code)
+     (cdr (car (cdr code))))

@@ -295,6 +295,7 @@
      (display "require 'lib/lib.rb'\n" out_file)
      (loop (block ()
 		 (= ruby_str (compile (read in_file) false))
+		 ;(puts ruby_str)
 		 ;(eval ruby_str TOPLEVEL_BINDING)
 		 (display ruby_str out_file)
 		 (if (in_file.eof?)

@@ -1,7 +1,7 @@
 class Array
  def get(num)
   self[num]
- end	
+ end
 end
 
 def display(sexp, out=STDOUT)
@@ -13,7 +13,7 @@ def newline(out=STDOUT)
 end
 
 def putlist(a, out)
- if a.kind_of?(Array)
+ if a.kind_of?(Array) and a.length == 2
   out.print '('
   putlist_loop a, out
  else
@@ -25,7 +25,13 @@ def putlist_loop(a, out)
   if(a[1] != nil)
     putlist a[0], out
     out.print ' '
-    putlist_loop(a[1], out)
+    if a[1].kind_of?(Array)
+     putlist_loop(a[1], out)
+    else
+      out.print ". "
+      out.print a[1]
+      out.print ")"
+    end
   else
     putlist a[0], out
     out.print ")"
