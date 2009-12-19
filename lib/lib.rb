@@ -102,3 +102,16 @@ def cdadr(code)
 code[1][0][1]
 end
 
+def a2l(array)
+lamcall(lambda {|i, array, lis|
+loop() {||
+if array.length() == i
+break
+end
+lis = [array.get(i),lis]
+i = i + 1
+}
+lis
+}, 0, array.reverse(), nil)
+end
+

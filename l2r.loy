@@ -103,7 +103,8 @@
 	    (display code) 
 	    (newline)
 	    (exit 1))))
-
+(def (macro? exp)
+     (
 (def (run_compile code argp)
      (+ "" (car code) 
 	(if (null? (cdr code))

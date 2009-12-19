@@ -6,7 +6,8 @@
      (o.kind_of? Numeric))
 (def symbol? (o)
      (o.kind_of? Symbol))
-
+(def pair? (o)
+     (o.kind_of? Array))
 (def eq? (a b)
      (a.equal? b))
 
