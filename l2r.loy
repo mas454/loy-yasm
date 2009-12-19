@@ -69,6 +69,8 @@
 		   (+ ":" (wqu) (cadr code) (wqu)))
 		  (else
 		   (compile (quote_compile (cadr code)) argp))))
+	   ((rasm? code)
+	    (cadr code))
 	   ((set? code)
 	    (+ "" (cadr code) " = " (compile (caddr code) false)))
 	   ((cons? code)
@@ -123,7 +125,10 @@
 (def (infix? exp)
   (memq (car exp) '(+ - * / % **  ^ & or)))
 (def (begin? exp)
-  (tagged_list? exp 'begin))
+     (tagged_list? exp 'begin))
+
+(def (rasm? exp)
+     (tagged_list? exp 'rasm))
 
 (def (infix_compile inf arg_list argp)
      (+ (compile (car arg_list) true)
