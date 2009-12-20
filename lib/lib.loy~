@@ -71,3 +71,12 @@
 
 (def (cdadr code)
      (cdr (car (cdr code))))
+
+(def (a2l array)
+     (let ((i 0) (array (array.reverse)) (lis nil))
+       (loop 
+	(block ()
+	       (if (== (array.length) i) break)
+	       (= lis (cons (array.get i) lis))
+	       (= i (+ i 1))))
+       lis))

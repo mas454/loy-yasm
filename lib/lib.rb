@@ -115,3 +115,13 @@ lis
 }, 0, array.reverse(), nil)
 end
 
+def memq(sym, lis)
+if null?(lis)
+false
+elsif eq?(sym, lis[0])
+lis
+else
+memq(sym, lis[1])
+end
+end
+

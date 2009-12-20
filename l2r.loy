@@ -88,6 +88,14 @@
 	    (compile (let_compile (cdr code)) argp))
 	   ((def? code)
 	    (def_compile (cdr code)))
+           ((define_macro? code)
+	    (if (symbol? (cadr code))
+		(= macro_list (cons (cadr code) macro_list))
+	      (= macro_list (cons (caadr code) macro_list)))
+	    (def_compile (cdr code)))
+	   ((macro? code)
+	    (let ((mac (eval (macro_compile code))))
+	      (compile mac argp)))
 	   ((lambda? code)
 	    (lambda_compile (cdr code) argp))
 	   ((begin? code)
@@ -103,8 +111,22 @@
 	    (display code) 
 	    (newline)
 	    (exit 1))))
+
+(= macro_list nil)
+(def (define_macro? exp)
+     (tagged_list? (car exp) 'macro))
+
 (def (macro? exp)
-     (
+     (if (pair? exp) 
+	 (memq (car exp) macro_list)
+       false))
+
+(def (macro_compile code argp)
+     (+ "" (car code)
+	(if (null? (cdr code))
+	    (+ "()" (argp_print argp))
+	  (+ (macro_args_compile (cdr code)) (argp_print argp)))))
+	  
 (def (run_compile code argp)
      (+ "" (car code) 
 	(if (null? (cdr code))
@@ -114,17 +136,12 @@
 		(+ "()" (block_compile (cdadr code)))
 		(args_compile (cdr code) argp)))))
 
-(def (memq sym lis)
-     (cond 
-      ((null? lis) 
-       false)
-      ((eq? sym (car lis))
-       lis)
-      (else
-       (memq sym (cdr lis)))))
+ 
+
 	 
 (def (infix? exp)
   (memq (car exp) '(+ - * / % **  ^ & or)))
+
 (def (begin? exp)
      (tagged_list? exp 'begin))
 
@@ -153,7 +170,8 @@
 	 (begin
 	   (+ "" (car lis)
 	      (string_list_append (map (lambda (code)
-					   (+ ", " code)) (cdr lis)))))))
+					 (+ ", " code)) (cdr lis)))))))
+
 (def (def_compile code)
      (if (symbol? (car code))
 	 (begin
@@ -166,7 +184,12 @@
 	      (def_arg_string (cdar code)) ")\n"
 	      (program_list_compile (cdr code))
 	      "end\n\n"))))
-		  
+
+(def (macro_args_compile lis)
+     (string_list_append
+      (map (lambda (a)
+	     (compile (quote_compile a) true))  lis)))
+
 (def (quote_compile lis)
      (cond 
       ((null? lis) nil)
@@ -300,10 +323,12 @@
 (def (l2r_compile in_file out_file)
      (display "require 'lib/lib.rb'\n" out_file)
      (loop (block ()
-		 (= ruby_str (compile (read in_file) false))
+		 (= exp (read in_file))
+		 (= ruby_str (compile exp false))
 		 ;(puts ruby_str)
-		 ;(eval ruby_str TOPLEVEL_BINDING)
-		 (display ruby_str out_file)
+		 (eval ruby_str TOPLEVEL_BINDING)
+		 (if (not (define_macro? exp))
+		     (display ruby_str out_file))
 		 (if (in_file.eof?)
 		     (quit)))))
 (def (repl)
@@ -330,4 +355,4 @@
 ;(eval (program_list_compile test))
 ;(l2r_compile (open "l2r.loy" "r") (open "testl2r.rb" "w"))
 ;(repl)
-(main)
+;(main)
