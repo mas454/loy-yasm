@@ -72,6 +72,12 @@
 (def (cdadr code)
      (cdr (car (cdr code))))
 
+(def (caadr code)
+     (car (car (cdr code))))
+
+(def (cadar code)
+     (car (cdr (car code))))
+
 (def (a2l array)
      (let ((i 0) (array (array.reverse)) (lis nil))
        (loop 
@@ -89,3 +95,17 @@
        lis)
       (else
        (memq sym (cdr lis)))))
+
+(def (transfer ls)
+    (if (pair? ls)
+        (if (pair? (car ls))
+            (if (eq? (caar ls) 'unquote)
+                (list 'cons (cadar ls) (transfer (cdr ls)))
+              (if (eq? (caar ls) 'unquote-splicing)
+                  (list 'append2 (cadar ls) (transfer (cdr ls)))
+                (list 'cons (transfer (car ls)) (transfer (cdr ls)))))
+          (list 'cons (list 'quote (car ls)) (transfer (cdr ls))))
+      (list 'quote ls))))
+
+(macro (quasiquote x)
+       (transfer x))

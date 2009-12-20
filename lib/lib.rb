@@ -1,4 +1,3 @@
-require 'lib/lib.rb'
 require("lib/read.rb")
 require("lib/loy.rb")
 def string?(a)
@@ -106,6 +105,10 @@ def caadr(code)
 code[1][0][0]
 end
 
+def cadar(code)
+code[0][1][0]
+end
+
 def a2l(array)
 lamcall(lambda {|i, array, lis|
 loop() {||
@@ -126,6 +129,26 @@ elsif eq?(sym, lis[0])
 lis
 else
 memq(sym, lis[1])
+end
+end
+
+def transfer(ls)
+if pair?(ls)
+if pair?(ls[0])
+if eq?(caar(ls), :"unquote")
+list(:"cons", cadar(ls), transfer(ls[1]))
+else
+if eq?(caar(ls), :"unquote-splicing")
+list(:"append2", cadar(ls), transfer(ls[1]))
+else
+list(:"cons", transfer(ls[0]), transfer(ls[1]))
+end
+end
+else
+list(:"cons", list(:"quote", ls[0]), transfer(ls[1]))
+end
+else
+list(:"quote", ls)
 end
 end
 

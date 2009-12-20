@@ -14,7 +14,6 @@ class Reader
       #ch = i.getc.chr #.id2name
       str = io.gets.chop!
       i = 0
-      puts str
       while str[i] != nil
        if str[i] == "("
         lparen += 1

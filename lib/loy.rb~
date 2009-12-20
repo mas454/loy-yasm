@@ -1,3 +1,4 @@
+require "lib/read.rb"
 class Array
  def get(num)
   self[num]
@@ -45,7 +46,7 @@ def list_loopmul(lis, num)
  if lis.length()==num+1
   lis[num]
  else
-  [lis.[](num),list_loop(lis,num+1)]
+  [lis.[](num),list_loopmul(lis,num+1)]
  end 
 end
 
