@@ -80,3 +80,12 @@
 	       (= lis (cons (array.get i) lis))
 	       (= i (+ i 1))))
        lis))
+
+(def (memq sym lis)
+     (cond 
+      ((null? lis) 
+       false)
+      ((eq? sym (car lis))
+       lis)
+      (else
+       (memq sym (cdr lis)))))

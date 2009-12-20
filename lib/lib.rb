@@ -102,6 +102,10 @@ def cdadr(code)
 code[1][0][1]
 end
 
+def caadr(code)
+code[1][0][0]
+end
+
 def a2l(array)
 lamcall(lambda {|i, array, lis|
 loop() {||

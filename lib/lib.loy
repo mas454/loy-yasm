@@ -72,6 +72,9 @@
 (def (cdadr code)
      (cdr (car (cdr code))))
 
+(def (caadr code)
+     (car (car (cdr code))))
+
 (def (a2l array)
      (let ((i 0) (array (array.reverse)) (lis nil))
        (loop 
