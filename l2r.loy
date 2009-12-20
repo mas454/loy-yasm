@@ -331,8 +331,6 @@
 		     (display ruby_str out_file))
 		 (if (in_file.eof?)
 		     (begin
-		      (display $macro_list)
-		      (newline)
 		      (quit))))))
 (def (repl)
      (loop (block ()
