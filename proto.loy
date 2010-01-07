@@ -1,0 +1,56 @@
+(macro (defclass x *body)
+       `(begin
+	 (rasm "class ")
+	 ,x
+	 ,@(a2l body)
+	 (rasm "end\n")))
+
+(macro (def_init args *body)
+       `(def initialize ,args	     
+	     ,@(a2l body) (rasm "")))
+(def (test args body)
+     `(def initialize ,args
+	   ,@body))
+;(display (test '(a) '((+ 10 20))))
+(def_init (a b)
+  (+ a b))
+
+(defclass Responder
+  (def (initialize name)
+    (= @name name))
+
+  (def (response input)
+       (+ input "ってなに?"))
+  (def (name)
+       @name))
+
+(defclass Unmo
+  (def (initialize name)
+    (= @name name)
+    (= @responder (Responder.new "What")))
+
+  (def (dialogue input)
+       (@responder.response input))
+
+  (def (responder_name)
+       (@responder.name))
+  (def (name)
+       @name))
+
+(def (prompt unmo)
+     (+ unmo.name ":" unmo.responder_name "> "))
+
+(def (main)
+     (puts "Unmo System prototype : proto")
+     (= proto (Unmo.new "proto"))
+
+     (loop 
+      (block ()
+	     (print "> ")
+	     (= input (gets.chomp!))
+	     (if (== input "")
+		 break)
+	     (puts (+ (prompt proto) (proto.dialogue input))))))
+
+
+(main)

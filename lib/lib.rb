@@ -1,3 +1,4 @@
+require 'lib/lib.rb'
 require("lib/read.rb")
 require("lib/loy.rb")
 def string?(a)
@@ -44,7 +45,7 @@ app_list = [li,app_list]
 app_list
 end
 
-def append2(xs, ys)
+def append2(xs, ys=nil)
 if null?(xs)
 ys
 else
@@ -132,6 +133,18 @@ memq(sym, lis[1])
 end
 end
 
+def assoc(key, lis)
+if null?(lis)
+#f
+else
+if eq?(key, caar(lis))
+lis[0]
+else
+assoc(key, lis[1])
+end
+end
+end
+
 def transfer(ls)
 if pair?(ls)
 if pair?(ls[0])
@@ -148,7 +161,11 @@ else
 list(:"cons", list(:"quote", ls[0]), transfer(ls[1]))
 end
 else
+if null?(ls)
+nil
+else
 list(:"quote", ls)
+end
 end
 end
 

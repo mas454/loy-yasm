@@ -167,12 +167,18 @@
 	(compile arg2 argp)))
 
 (def (def_arg_string lis)
+     (= arg_comp 
+	(lambda (arg)
+	  (if (symbol? arg)
+	      arg
+	    (+ "" (car arg) "=" (compile (cadr arg) true)))))
      (if (null? lis)
 	 ""
 	 (begin
-	   (+ "" (car lis)
+	   (+ "" (arg_comp.call (car lis))
 	      (string_list_append (map (lambda (code)
-					 (+ ", " code)) (cdr lis)))))))
+					 (+ ", " (arg_comp.call code))) 
+				       (cdr lis)))))))
 
 (def (def_compile code)
      (if (symbol? (car code))
@@ -188,9 +194,14 @@
 	      "end\n\n"))))
 
 (def (macro_args_compile lis)
-     (string_list_append
-      (map (lambda (a)
-	     (compile (quote_compile a) true))  lis)))
+     (+ (compile (quote_compile (car lis)) true)
+	(if (null? (cdr lis))
+	    ""
+	  (string_list_append
+	   (map (lambda (a)
+		  (+ ", "
+		     (compile (quote_compile a) true)))  (cdr lis))))))
+	
 
 (def (quote_compile lis)
      (cond 
@@ -240,7 +251,6 @@
 	 
 (def (args_compile args_list argp)
      (+ "(" (compile (car args_list) true)
-	
 	(string_list_append
 	 (map (lambda (code)
 		(if (tagged_list? code 'block)
