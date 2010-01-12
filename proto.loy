@@ -1,10 +1,3 @@
-(macro (defclass x *body)
-       `(begin
-	 (rasm "class ")
-	 ,x
-	 ,@(a2l body)
-	 (rasm "end\n")))
-
 (macro (def_init args *body)
        `(def initialize ,args	     
 	     ,@(a2l body) (rasm "")))
@@ -18,11 +11,12 @@
 (defclass Responder
   (def (initialize name)
     (= @name name))
-
   (def (response input)
        (+ input "ってなに?"))
+
   (def (name)
        @name))
+
 
 (defclass Unmo
   (def (initialize name)
@@ -39,6 +33,10 @@
 
 (def (prompt unmo)
      (+ unmo.name ":" unmo.responder_name "> "))
+
+(rasm "def abc\n
+        \nputs 30\n
+      \nend")
 
 (def (main)
      (puts "Unmo System prototype : proto")

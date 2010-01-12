@@ -119,3 +119,10 @@
 (macro (quasiquote x)
        (display (transfer x))
        (transfer x))
+
+(macro (defclass x *body)
+       `(begin
+	 (rasm "class ")
+	 ,x
+	 ,@(a2l body)
+	 (rasm "end\n")))
