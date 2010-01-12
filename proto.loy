@@ -5,12 +5,12 @@
      `(def initialize ,args
 	   ,@body))
 ;(display (test '(a) '((+ 10 20))))
-(def_init (a b)
-  (+ a b))
+
 
 (defclass Responder
   (def (initialize name)
     (= @name name))
+
   (def (response input)
        (+ input "ってなに?"))
 
@@ -34,9 +34,6 @@
 (def (prompt unmo)
      (+ unmo.name ":" unmo.responder_name "> "))
 
-(rasm "def abc\n
-        \nputs 30\n
-      \nend")
 
 (def (main)
      (puts "Unmo System prototype : proto")

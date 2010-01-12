@@ -30,7 +30,7 @@
 		      (= app_list (cons li app_list))))
      app_list)
 
-(def append2 (xs ys)
+(def append2 (xs (ys nil))
     (if (null? xs)
         ys
       (cons (car xs) (append2 (cdr xs) ys))))
@@ -96,6 +96,13 @@
       (else
        (memq sym (cdr lis)))))
 
+(def (assoc key lis)
+     (if (null? lis)
+	 #f
+       (if (eq? key (caar lis))
+	   (car lis)
+	 (assoc key (cdr lis)))))
+
 (def (transfer ls)
     (if (pair? ls)
         (if (pair? (car ls))
@@ -105,7 +112,17 @@
                   (list 'append2 (cadar ls) (transfer (cdr ls)))
                 (list 'cons (transfer (car ls)) (transfer (cdr ls)))))
           (list 'cons (list 'quote (car ls)) (transfer (cdr ls))))
-      (list 'quote ls))))
+      (if (null? ls)
+	  nil
+	(list 'quote ls))))
 
 (macro (quasiquote x)
+       (display (transfer x))
        (transfer x))
+
+(macro (defclass x *body)
+       `(begin
+	 (rasm "class ")
+	 ,x
+	 ,@(a2l body)
+	 (rasm "end\n")))

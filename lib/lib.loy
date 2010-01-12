@@ -117,7 +117,6 @@
 	(list 'quote ls))))
 
 (macro (quasiquote x)
-       (display (transfer x))
        (transfer x))
 
 (macro (defclass x *body)

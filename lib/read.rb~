@@ -79,6 +79,15 @@ class Reader
 	return makeList
       when "'"
 	return makeQuote
+      when "`"
+        return makeQuasiquote
+      when ","
+        if @line[@indexOfLine] == "@"
+          getChar
+          return makeUnquote_splicing
+        else
+          return makeUnquote
+        end
       when "-"
 	return makeMinusNumber
       when "\""
@@ -184,6 +193,37 @@ class Reader
     #else
      #list[1] = sexp
     #end
+    top
+  end
+  def makeQuasiquote
+    top = Array.new 2
+    list = top
+    qulist = Array.new 2
+    list[0] = :quasiquote
+    getChar
+    sexp = getSexp
+    list[1] = [sexp, nil]
+    top
+  end
+  
+  def makeUnquote
+    top = Array.new 2
+    list = top
+    qulist = Array.new 2
+    list[0] = :unquote
+    getChar
+    sexp = getSexp
+    list[1] = [sexp, nil]
+    top
+  end
+  def makeUnquote_splicing
+    top = Array.new 2
+    list = top
+    qulist = Array.new 2
+    list[0] = :"unquote-splicing"
+    getChar
+    sexp = getSexp
+    list[1] = [sexp, nil]
     top
   end
   def makeString

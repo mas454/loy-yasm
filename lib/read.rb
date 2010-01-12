@@ -12,7 +12,8 @@ class Reader
     lparen = 0
     while(!io.eof?)
       #ch = i.getc.chr #.id2name
-      str = io.gets.chop!
+      #str = io.gets.chop!
+      str = io.gets.sub("\n", " ")
       i = 0
       while str[i] != nil
        if str[i] == "("

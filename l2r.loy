@@ -343,7 +343,7 @@
 		 (if (not (define_macro? exp))
 		     (display ruby_str out_file))
 		 (out_file.flush)
-		 (if (not (main? exp))
+		 (if (or (def? exp) (define_macro? exp)(macro? exp)) 
 		     (eval ruby_str TOPLEVEL_BINDING))
 		 (if (in_file.eof?)
 		     (begin
