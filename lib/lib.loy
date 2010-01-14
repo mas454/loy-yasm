@@ -141,3 +141,22 @@
 	     (else
 	      res))
      ,@(a2l body)))
+
+(macro (make_hash a hash_list)
+  `(begin
+     (rasm ,a.to_s)
+     (rasm " = {")
+     ,@(map (lambda (val)
+	      `(begin
+		 (macro_val_print ,(car val))
+		 (rasm " => ")
+		 (macro_val_print ,(cadr val))
+		 (rasm ", "))) hash_list)
+     (rasm "}")))
+
+(macro (gethash a key)
+  `(begin
+     (macro_val_print ,a)
+     (rasm "[")
+     (macro_val_print ,key)
+     (rasm "]")))
