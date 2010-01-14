@@ -125,3 +125,19 @@
 	 ,x
 	 ,@(a2l body)
 	 (rasm "end\n")))
+(macro (try *body)
+  `(begin
+     (rasm "begin\n")
+     ,@(a2l body)
+     (rasm "end")))
+(macro (catch res *body)
+  `(begin
+     (rasm "rescue ")
+     ,@(cond ((null? res)
+	      "")
+	     ((eq? '=> (car res))
+	      `((rasm "=> ")
+		,(cadr res)))
+	     (else
+	      res))
+     ,@(a2l body)))
