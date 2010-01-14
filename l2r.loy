@@ -54,6 +54,8 @@
 
 (def (wqu)
      "\"")
+(def (macro_val_print? code)
+ (tagged_list? code 'macro_val_print))
 
 (def (compile code argp)
      (cond ((string? code)
@@ -62,10 +64,6 @@
 	    (+ "" code.to_s (argp_print argp)))
 	   ((quote? code)
 	    (cond ((symbol? (cadr code))
-		   ;(cond ((eq? (cadr code) '=)
-			;  (+ ":" (wqu) "=" (wqu)))
-			 ;((eq? (cadr 
-		     ;(+ ":" (cadr code))))
 		   (+ ":" (wqu) (cadr code) (wqu)))
 		  (else
 		   (compile (quote_compile (cadr code)) argp))))
@@ -96,7 +94,9 @@
 	   ((macro? code)
             (= str (macro_compile code argp))
 	    (let ((mac (eval str TOPLEVEL_BINDING)))
-	      (compile mac argp)))
+	      (+ (compile mac argp) (argp_print argp))))
+	   ((macro_val_print? code)
+	    (compile (cadr code) true))
 	   ((lambda? code)
 	    (lambda_compile (cdr code) argp))
 	   ((begin? code)
