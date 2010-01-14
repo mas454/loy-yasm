@@ -1,0 +1,25 @@
+
+       	   
+
+(macro (def_c k name args  *body)
+  `(begin
+     (macro_val_print ,k)
+     (rasm " ")
+     (macro_val_print ,name)
+     (rasm "(")
+     (macro_val_print ,(caar args))
+     (rasm " ")
+     (macro_val_print ,(cadar args))
+     ,@(map (lambda (a)
+	      `(begin
+		 (rasm ",")
+		 (macro_val_print ,(car a))
+		 (rasm " ")
+		 (macro_val_print ,(cadr a))))(cdr args))
+     (rasm ")\n")
+     (rasm "{\n")
+     ,@(a2l body)
+     (rasm "}")))
+
+(def_c int add ((int a) (int b))
+  (+ a b))
