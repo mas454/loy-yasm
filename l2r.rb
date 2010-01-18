@@ -99,7 +99,6 @@ end
 
 
 def compile(code, argp)
-puts ""
 if string?(code)
 wqu() + code + wqu() + argp_print(argp)
 elsif object?(code)
@@ -436,18 +435,10 @@ compile(a, false)
 end
 
 
-cond_test = [[:"cond",[[:"false",[[:"puts",["hello, world",]],]],[[:"false",["hello",]],[[:"else",[[:"puts",[3004,]],]],]]]],]
-lambda_test = [[:"=",[:"lam",[[:"lambda",[[:"a",[:"b",]],[[:"puts",[:"a",[:"b",]]],]]],]]],[[:"lamcall",[:"lam",[10,[20,]]]],]]
 
-def_test = [[:"def",[[:"add",[:"a",[:"b",]]],[[:"puts",[:"a",[:"b",]]],]]],[[:"add",[2000,[30,]]],]]
-infix_test = [[:"puts",[[:"+",[10,[20,[30,[40,]]]]],]],]
-binfix_test = [[:"puts",[[:"<",[20,[30,]]],]],]
-;	
-;
 def quit()
 exit(0)
 end
-
 
 def l2r_compile(in_file, out_file)
 display("require 'lib/lib.rb'\n", out_file)
@@ -461,13 +452,13 @@ out_file.flush()
 if def?(exp) or define_macro?(exp) or macro?(exp)
 begin
 eval(ruby_str, TOPLEVEL_BINDING)
-rescue SyntaxError => e
+rescue SyntaxError
 puts("syntax error")
 display(exp)
 newline()
 puts("compile => 
 ", ruby_str)
-p e
+
 rescue => exec
 puts("compile eval error")
 display(exp)
@@ -499,10 +490,27 @@ end
 def repl()
 loop() {||
 display(">")
+begin
 sexp = read()
 expr = compile(sexp, false)
 display(eval(expr, TOPLEVEL_BINDING))
 newline()
+rescue SyntaxError
+puts("syntax error")
+display(sexp)
+newline()
+puts("compile =>
+", expr)
+
+rescue => exec
+puts("compile eval error")
+display(sexp)
+newline()
+puts("compile =>
+", expr)
+p(exec)
+
+end
 }
 end
 
