@@ -326,24 +326,7 @@
   (string_list_append (map (lambda (a)
 			     (compile a false)) code_list)))
 
-(= cond_test '((cond (false (puts "hello, world"))
-		    (false "hello")
-		    (else (puts 3004)))))
-(= lambda_test '((= lam (lambda (a b)
-			  (puts a b)))
-		      (lamcall lam 10 20)))
 
-(= def_test '((def (add a b)
-		   (puts a b))
-	      (add 2000 30)))
-(= infix_test '(
-		(puts (+ 10 20 30 40))))
-(= binfix_test '(
-		 (puts (< 20 30))))
-;(= block1_test '(
-	;	 (3.times (block (i) (p i)))
-		; )
-;)"
 (def (quit)
  (exit 0))
 (def (l2r_compile in_file out_file)
@@ -414,8 +397,5 @@
 	   (l2r_compile (open (ARGV.get 0) "r")
 			(open (ARGV.get 1) "w")))))
 			    
-;(eval (program_list_compile test))
-;(l2r_compile (open "l2r.loy" "r") (open "testl2r.rb" "w"))
-;(repl)
 (main)
 
