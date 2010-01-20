@@ -15,7 +15,7 @@
  
 (define (dprint . lis)
   (map (lambda (code)
-(display code out-p)) lis))
+	 (display code out-p)) lis))
  
 (define (set v)
   (dprint v " = "))
@@ -346,9 +346,10 @@ nil
   (with-input-from-file file-name
     (lambda ()
       (let loop ((ls1 '()) (s (read)))
-(if (eof-object? s)
-(reverse ls1)
-(loop (cons s ls1) (read)))))))
+	(if (eof-object? s)
+	    (reverse ls1)
+	    (loop (cons s ls1) (read)))))))
+
 (define out-p (open-output-file "l2r-test.rb"))
 (define out-p '())
  
@@ -377,8 +378,10 @@ nil
     (set! out-p (open-output-file (caddr args)))
     (dprint "require \"lib/lib.rb\"\n")
     (l2r program-list)))
+
 (define (l2r-test t-list)
   (dprint "require \"lib/lib.rb\"\n")
   (l2r t-list))
+
 ;(l2r-test reverse-test)
 ;(lib-compile)

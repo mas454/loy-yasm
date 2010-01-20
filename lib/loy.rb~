@@ -1,7 +1,11 @@
-require "lib/read.rb"
 class Array
  def get(num)
   self[num]
+ end
+end
+class NilClass
+ def to_s
+   "nil"
  end
 end
 

@@ -3,6 +3,14 @@ class Array
   self[num]
  end
 end
+class NilClass
+ def to_s
+   "nil"
+ end
+ def [](i)
+   nil
+ end
+end
 
 def display(sexp, out=STDOUT)
  putlist sexp, out
