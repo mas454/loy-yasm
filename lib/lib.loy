@@ -160,3 +160,32 @@
      (rasm "[")
      (macro_val_print ,key)
      (rasm "]")))
+
+(macro (lcase exp *body)
+       `(begin
+	 (rasm "case ")
+	 ,exp
+	 ,@(map (lambda (con)
+		  `(begin
+		    (rasm "when ")
+		    ,(car con)
+		    ,@(cdr con))) (a2l body))
+	 (rasm "\nend")))
+
+(macro (lwhile con *body)
+       `(begin
+	 (rasm "while ")
+	 ,con
+	 ,@(a2l body)
+	 (rasm "end¥n")))
+
+(macro (aref arr num)
+       `(begin
+	 (macro_val_print ,arr)
+	 (rasm "[")
+	 (macro_val_print ,num)
+	 (rasm "]")))
+
+(macro (asm str)
+       `(rasm ,str))
+
