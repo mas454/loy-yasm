@@ -185,3 +185,7 @@
 	 (rasm "[")
 	 (macro_val_print ,num)
 	 (rasm "]")))
+
+(macro (asm str)
+       `(rasm ,str))
+

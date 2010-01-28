@@ -1,17 +1,19 @@
-(macro (lcase exp *body)
+(macro (mcall fn x *args)
        `(begin
-	 (rasm "case ")
-	 ,exp
-	 ,@(map (lambda (con)
+	 (macro_val_print ,x)
+	 (rasm ".")
+	 (macro_val_print ,fn)
+	 (rasm "(")
+	 ,@(map (lambda (arg)
 		  `(begin
-		    (rasm "when ")
-		    ,(car con)
-		    ,@(cdr con))) (a2l body))
-	 (rasm "\nend")))
+		    (macro_val_print ,arg)
+		    (rasm ","))) (a2l args))
+	 (rasm ")\n")))
+(defclass Test
+  (def (ts a)
+       a))
+(= b (Test.new))
 
-(lcase 10
-      (0
-       (puts "hello"))
-      (10
-       (puts "hello")
-       (puts "ok!")))
+(mcall to_s (mcall ts b 40))
+
+;b.ts(20).to_s
