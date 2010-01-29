@@ -1,3 +1,4 @@
+#!ruby -Ks
 require 'lib/lib.rb'
 def string_list_append(str_list)
 if null?(str_list)

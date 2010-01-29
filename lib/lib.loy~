@@ -189,3 +189,16 @@
 (macro (asm str)
        `(rasm ,str))
 
+(macro (mcall fn x *args)
+       `(begin
+	 (macro_val_print ,x)
+	 (rasm ".")
+	 (macro_val_print ,fn)
+	 (rasm "(")
+	 ,@(map (lambda (arg)
+		  `(begin
+		    (macro_val_print ,arg)
+		    (rasm ","))) (a2l args))
+	 (rasm ")\n")))
+
+

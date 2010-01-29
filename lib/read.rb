@@ -56,7 +56,7 @@ class Reader
       nch = nil
     end
     while @ch == " "
-      if nch == ")"
+      if nch == ")" or nch == nil
 	getChar
 	break
       end

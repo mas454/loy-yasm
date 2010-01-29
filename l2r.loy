@@ -313,6 +313,7 @@
 (def (quit)
  (exit 0))
 (def (l2r_compile in_file out_file)
+     (display "#!ruby -Ks\n")
      (display "require 'lib/lib.rb'\n" out_file)
      (loop (block ()
 		 (= exp (read in_file))

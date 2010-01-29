@@ -9,11 +9,14 @@
 		    (macro_val_print ,arg)
 		    (rasm ","))) (a2l args))
 	 (rasm ")\n")))
+
 (defclass Test
   (def (ts a)
        a))
 (= b (Test.new))
 
-(mcall to_s (mcall ts b 40))
+(defclass Test2
+ (def (a b)
+      b))
 
-;b.ts(20).to_s
+
