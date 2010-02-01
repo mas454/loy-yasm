@@ -56,7 +56,7 @@ class Reader
       nch = nil
     end
     while @ch == " "
-      if nch == ")"
+      if nch == ")" or nch == nil
 	getChar
 	break
       end
@@ -179,6 +179,7 @@ class Reader
       list[1] = Array.new 2
       list = list[1]
     end
+    
     getChar
     top
   end

@@ -413,6 +413,7 @@ exit(0)
 end
 
 def l2r_compile(in_file, out_file)
+display("#!ruby -Ks\n", out_file)
 display("require 'lib/lib.rb'\n", out_file)
 loop() {||
 exp = read(in_file)

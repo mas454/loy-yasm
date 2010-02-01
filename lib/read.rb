@@ -18,6 +18,7 @@ class Reader
       while str[i] != nil
        if str[i] == "("
         lparen += 1
+
        elsif str[i] == ")"
         lparen -= 1
        elsif str[i] == ";"
@@ -43,7 +44,6 @@ class Reader
     getSexp
   end
   def getChar
-   
     if @line[@indexOfLine] != nil
       @ch = @line[@indexOfLine].chr
     end
@@ -92,7 +92,8 @@ class Reader
       when "-"
 	return makeMinusNumber
       when "\""
-	return makeString
+	s = makeString
+        return s
       else
 	if /\s/ =~ @ch
 	  #break
@@ -179,6 +180,7 @@ class Reader
       list[1] = Array.new 2
       list = list[1]
     end
+    
     getChar
     top
   end
