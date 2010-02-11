@@ -19,6 +19,8 @@
 		 (if (in_file.eof?)
 		     (begin
 		      (quit))))))
+
+
 (def (interp_main)
      (lib_compile)
      (interp (open (ARGV.get 0) "r")))

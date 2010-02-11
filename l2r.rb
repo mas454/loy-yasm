@@ -428,3 +428,33 @@ def quit()
 exit(0)
 end
 
+nil
+def load(path)
+in_file = open(path, "r")
+loop() {||
+exp = read(in_file)
+ruby_str = compile(exp, false)
+begin
+eval(ruby_str, TOPLEVEL_BINDING)
+rescue SyntaxError
+puts("syntax error")
+display(exp)
+newline()
+puts("compile => 
+", ruby_str)
+
+rescue => exec
+puts("compile eval error")
+display(exp)
+newline()
+puts("compile =>
+", ruby_str)
+p(exec)
+
+end
+if in_file.eof?()
+quit()
+end
+}
+end
+

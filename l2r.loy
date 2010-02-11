@@ -330,3 +330,25 @@
 
 (def (quit)
  (exit 0))
+
+(def (load path)
+     (= in_file (open path "r"))
+     (loop (block ()		  
+		 (= exp (read in_file))
+		 (= ruby_str (compile exp false))
+		 (try
+		  (eval ruby_str TOPLEVEL_BINDING)
+		  (catch (SyntaxError)
+		    (puts "syntax error")
+		    (display exp)
+		    (newline)
+		    (puts "compile => \n" ruby_str))
+		  (catch (=> exec)
+		    (puts "compile eval error")
+		    (display exp)
+		    (newline)
+		    (puts "compile =>\n" ruby_str)
+		    (p exec)))
+		 (if (in_file.eof?)
+		     (begin
+		      (quit))))))

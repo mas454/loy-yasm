@@ -173,7 +173,8 @@
 	 ,exp
 	 ,@(map (lambda (con)
 		  `(begin
-		    (rasm "when ")
+		    ,(if (not (eq? (car con) 'else))
+			 '(rasm "when "))
 		    ,(car con)
 		    ,@(cdr con))) (a2l body))
 	 (rasm "\nend")))

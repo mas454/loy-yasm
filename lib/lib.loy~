@@ -115,11 +115,17 @@
       (if (null? ls)
 	  nil
 	(list 'quote ls))))
+(def (list_ref list num)
+     (loop (block ()
+	     (if (== num 0)
+		 (return (car list)))
+	     (= num (- num 1))
+	     (= list (cdr list)))))
 
 (macro (quasiquote x)
        (transfer x))
 
-(macro (defclass x *body)
+(macro (class x *body)
        `(begin
 	 (rasm "class ")
 	 ,x
@@ -161,7 +167,7 @@
      (macro_val_print ,key)
      (rasm "]")))
 
-(macro (lcase exp *body)
+(macro (case exp *body)
        `(begin
 	 (rasm "case ")
 	 ,exp
@@ -172,7 +178,7 @@
 		    ,@(cdr con))) (a2l body))
 	 (rasm "\nend")))
 
-(macro (lwhile con *body)
+(macro (while con *body)
        `(begin
 	 (rasm "while ")
 	 ,con
@@ -202,3 +208,44 @@
 	 (rasm ")\n")))
 
 
+(macro (define arg *body)
+       `(= ,(car arg) ,(cons 'lambda (cons (cdr arg) (a2l body)))))
+
+(macro (when con *body)
+       `(if ,con
+	    (begin ,@(a2l body))))
+
+(macro (sets *varl_list)
+       (define (fun varl_array)
+         (= k nil)
+	 (= i 0)
+	 (loop 
+	  (block ()
+		 (= k (cons (list  '= (aref varl_array i) 
+				   (aref varl_array i+1)) k))
+		 i+=2
+		 (when (> i varl_array.size-1)
+		   break)))
+          (reverse k))
+       `(begin
+	 ,@(fun.call varl_list)))
+
+(macro (attr_reader *geters)
+       `(begin
+	  (rasm "attr_reader ")
+	 (macro_val_print ,(aref geters 0))
+	 ,@(map (lambda (val)
+		  `(begin
+		    (rasm ", ")
+		    (macro_val_print ,val))) (cdr (a2l geters)))))
+
+(macro (new_hash *hash_list)
+  `(begin
+     (rasm "{")
+     ,@(map (lambda (val)
+	      `(begin
+		 (macro_val_print ,(car val))
+		 (rasm " => ")
+		 (macro_val_print ,(cadr val))
+		 (rasm ", "))) (a2l hash_list))
+     (rasm "}")))
