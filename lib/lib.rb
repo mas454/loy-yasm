@@ -1,3 +1,4 @@
+#!ruby -Ks
 require 'lib/lib.rb'
 require("lib/read.rb")
 require("lib/loy.rb")
@@ -21,14 +22,17 @@ def eq?(a, b)
 a.equal?(b)
 end
 
+nil
 def null?(a)
 a.nil?()
 end
 
+nil
 def open_input_file(path)
 open(path, "r")
 end
 
+nil
 def map(fn, lis)
 if null?(lis)
 nil
@@ -37,6 +41,7 @@ else
 end
 end
 
+nil
 def append(*lis)
 app_list = nil
 lis.map() {|li|
@@ -45,6 +50,7 @@ app_list = [li,app_list]
 app_list
 end
 
+nil
 def append2(xs, ys=nil)
 if null?(xs)
 ys
@@ -53,6 +59,7 @@ else
 end
 end
 
+nil
 def reverse(lis)
 rev = lambda {|lis, retlis|
 if null?(lis)
@@ -64,10 +71,12 @@ end
 rev.call(lis, nil)
 end
 
+nil
 def newarray(*arr)
 arr
 end
 
+nil
 def memq(sym, lis)
 if null?(lis)
 false
@@ -78,38 +87,47 @@ memq(sym, lis[1])
 end
 end
 
+nil
 def caar(code)
 code[0][0]
 end
 
+nil
 def cdar(code)
 code[0][1]
 end
 
+nil
 def cddr(code)
 code[1][1]
 end
 
+nil
 def cadr(code)
 code[1][0]
 end
 
+nil
 def caddr(code)
 code[1][1][0]
 end
 
+nil
 def cdadr(code)
 code[1][0][1]
 end
 
+nil
 def caadr(code)
 code[1][0][0]
 end
 
+nil
 def cadar(code)
 code[0][1][0]
 end
 
+nil
 def a2l(array)
 lamcall(lambda {|i, array, lis|
 loop() {||
@@ -123,6 +141,7 @@ lis
 }, 0, array.reverse(), nil)
 end
 
+nil
 def memq(sym, lis)
 if null?(lis)
 false
@@ -133,6 +152,7 @@ memq(sym, lis[1])
 end
 end
 
+nil
 def assoc(key, lis)
 if null?(lis)
 #f
@@ -145,6 +165,7 @@ end
 end
 end
 
+nil
 def transfer(ls)
 if pair?(ls)
 if pair?(ls[0])
@@ -169,3 +190,25 @@ end
 end
 end
 
+def list_ref(list, num)
+loop() {||
+if num == 0
+return(list[0])
+end
+num = num - 1
+list = list[1]
+}
+end
+
+nil
+nil
+nil
+nil
+nil
+nil
+nil
+nil
+nil
+nil
+nil
+nil

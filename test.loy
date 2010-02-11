@@ -9,14 +9,14 @@
 		    (macro_val_print ,arg)
 		    (rasm ","))) (a2l args))
 	 (rasm ")\n")))
-
-(defclass Test
-  (def (ts a)
-       a))
-(= b (Test.new))
-
-(defclass Test2
- (def (a b)
-      b))
-
-
+(macro (new_hash *hash_list)
+  `(begin
+     (rasm "{")
+     ,@(map (lambda (val)
+	      `(begin
+		 (macro_val_print ,(car val))
+		 (rasm " => ")
+		 (macro_val_print ,(cadr val))
+		 (rasm ", "))) (a2l hash_list))
+     (rasm "}")))
+(new_hash ("a" 10) ("b" 30))

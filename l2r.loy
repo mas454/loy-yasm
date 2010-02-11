@@ -73,7 +73,7 @@
 	    (if (symbol? (cadr code))
 		(= $macro_list (cons (cadr code) $macro_list))
 	      (= $macro_list (cons (caadr code) $macro_list)))
-	    (def_compile (cdr code)))
+	    (macro_def_compile (cdr code)))
 	   ((macro? code)
             (= str (macro_compile code argp))
 	    (try
@@ -119,7 +119,7 @@
        false))
 
 (def (macro_compile code argp)
-     (+ "" (car code)
+     (+ "_" (car code)
 	(if (null? (cdr code))
 	    (+ "()" (argp_print argp))
 	  (+ "(" (macro_args_compile (cdr code)) ")" (argp_print argp)))))
@@ -187,6 +187,11 @@
 	      (def_arg_string (cdar code)) ")\n"
 	      (program_list_compile (cdr code))
 	      "end\n\n"))))
+(def (macro_def_compile code)
+     (+ "def _" (caar code) "("
+	      (def_arg_string (cdar code)) ")\n"
+	      (program_list_compile (cdr code))
+	      "end\n\n"))
 
 (def (macro_args_compile lis)
      (+ (compile (quote_compile (car lis)) true)
@@ -309,35 +314,6 @@
   (string_list_append (map (lambda (a)
 			     (compile a false)) code_list)))
 
-
-(def (quit)
- (exit 0))
-(def (l2r_compile in_file out_file)
-     (display "#!ruby -Ks\n" out_file)
-     (display "require 'lib/lib.rb'\n" out_file)
-     (loop (block ()
-		 (= exp (read in_file))
-		 (= ruby_str (compile exp false))
-		 (if (not (define_macro? exp))
-		     (display ruby_str out_file))
-		 (out_file.flush)
-		 (if (or (def? exp) (define_macro? exp))
-		     (try
-		      (eval ruby_str TOPLEVEL_BINDING)
-		      (catch (SyntaxError)
-			(puts "syntax error")
-			(display exp)
-			(newline)
-			(puts "compile => \n" ruby_str))
-		      (catch (=> exec)
-			(puts "compile eval error")
-			(display exp)
-			(newline)
-			(puts "compile =>\n" ruby_str)
-			(p exec))))
-		 (if (in_file.eof?)
-		     (begin
-		      (quit))))))
 (def (lib_compile)
      (= in_file (open "lib/lib.loy" "r"))
      ;(= out_file (open "lib/lib.rb" "w"))
@@ -351,35 +327,6 @@
 		     (begin
 		      ;(out_file.flush)
 		      break)))))
-(def (repl)
-     (loop (block ()
-	    (display ">")
-	    (try
-	     (= sexp (read))
-	     (= expr (compile sexp false))
-	     (display (eval expr TOPLEVEL_BINDING))
-	     (newline)
-	     (catch (SyntaxError)
-		    (puts "syntax error")
-		    (display sexp)
-		    (newline)
-		    (puts "compile =>\n" expr))
-	     (catch (=> exec)
-	       (puts "compile eval error")
-	       (display sexp)
-	       (newline)
-	       (puts "compile =>\n" expr)
-	       (p exec))))))
 
-(def (main)
-     (lib_compile)
-     (if (null? (ARGV.get 0))
-	 (repl)
-	 (if (null? (ARGV.get 1))
-	   (l2r_compile (open (ARGV.get 0) "r")
-			(open "out.rb" "w"))
-	   (l2r_compile (open (ARGV.get 0) "r")
-			(open (ARGV.get 1) "w")))))
-			    
-(main)
-
+(def (quit)
+ (exit 0))
