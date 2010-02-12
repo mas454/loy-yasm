@@ -250,3 +250,11 @@
 		 (macro_val_print ,(cadr val))
 		 (rasm ", "))) (a2l hash_list))
      (rasm "}")))
+
+(macro (defclass name *body)
+       (define (defs def_list)
+	 (if (eq? (car def_list) 'attr_reader)
+	     def_list
+	   (cons 'def def_list)))
+       `(class ,name
+	       ,@(map defs (a2l body))))

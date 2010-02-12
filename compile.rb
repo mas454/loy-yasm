@@ -1,6 +1,6 @@
 #!ruby -Ks
 require 'lib/lib.rb'
-require("l2r.rb")
+require("out.rb")
 def l2r_compile(in_file, out_file)
 display("#!ruby -Ks\n", out_file)
 display("require 'lib/lib.rb'\n", out_file)
@@ -37,18 +37,7 @@ end
 }
 end
 
-def lib_compile()
-in_file = open("lib/lib.loy", "r")
-loop() {||
-exp = read(in_file)
-ruby_str = compile(exp, false)
-eval(ruby_str, TOPLEVEL_BINDING)
-if in_file.eof?()
-break
-end
-}
-end
-
+nil
 def repl()
 loop() {||
 display(">")
